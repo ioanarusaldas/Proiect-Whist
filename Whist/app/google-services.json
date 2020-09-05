@@ -1,0 +1,48 @@
+{
+  "project_info": {
+    "project_number": "604588080045",
+    "firebase_url": "https://whist-1d598.firebaseio.com",
+    "project_id": "whist-1d598",
+    "storage_bucket": "whist-1d598.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:604588080045:android:23da49c558add9f0f2bf24",
+        "android_client_info": {
+          "package_name": "com.example.whist"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "604588080045-482b6jd3g650t374kteue6bddt97qkl0.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.whist",
+            "certificate_hash": "3d9ebd655d4d5af62d910dd584375e6fbbd9edfb"
+          }
+        },
+        {
+          "client_id": "604588080045-62oqrfi8mqvmlhopj3clhfhnan6drjrf.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDbQiNL4IOkkLqSH27EKm0xh42_MbD5edM"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "604588080045-62oqrfi8mqvmlhopj3clhfhnan6drjrf.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

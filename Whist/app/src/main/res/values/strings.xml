@@ -1,3 +1,5 @@
 <resources>
     <string name="app_name">Whist</string>
+    <string name="join_game">Join Game</string>
+    <string name="enter_name">Enter name</string>
 </resources>

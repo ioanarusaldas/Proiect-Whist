@@ -2,6 +2,7 @@ package com.example.whist;
 
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
@@ -14,7 +15,6 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-
     }
 
     public void shuffleCards(View view) {
@@ -24,5 +24,11 @@ public class MainActivity extends AppCompatActivity {
         Log.d("Player 2", cards.subList(8, 16).toString());
         Log.d("Player 3", cards.subList(16, 24).toString());
         Log.d("Player 4", cards.subList(24, 32).toString());
+    }
+
+
+    public void joinGame(View view) {
+        Intent myIntent = new Intent(this, WaitingRoomActivity.class);
+        startActivity(myIntent);
     }
 }
