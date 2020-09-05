@@ -2,4 +2,5 @@
     <string name="app_name">Whist</string>
     <string name="join_game">Join Game</string>
     <string name="enter_name">Enter name</string>
+    <string name="connected_players">Connected Players (%1$d):</string>
 </resources>
