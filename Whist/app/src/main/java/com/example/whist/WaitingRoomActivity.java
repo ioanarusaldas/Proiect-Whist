@@ -7,6 +7,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import android.app.Activity;
 import android.content.Context;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.KeyEvent;
 import android.view.View;
 import android.view.inputmethod.InputMethodManager;
@@ -35,9 +36,12 @@ public class WaitingRoomActivity extends AppCompatActivity {
     private DatabaseReference mPlayerReference;
     private TextView mConnectedPlayersView;
 
+    private final List<String> playerList = new ArrayList<>();
     // Se retine index-ul si numele jucatorului
     private String playerName;
     private int playerIndex;
+
+    private boolean disconnected = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -48,8 +52,7 @@ public class WaitingRoomActivity extends AppCompatActivity {
 
         mPlayerNameList = findViewById(R.id.player_name_list);
 
-        // Create a List from String Array elements
-        final List<String> playerList = new ArrayList<>();
+
         // Create an ArrayAdapter from List
         final ArrayAdapter<String> arrayAdapter = new ArrayAdapter<>
                 (this, android.R.layout.simple_list_item_1, playerList);
@@ -73,18 +76,28 @@ public class WaitingRoomActivity extends AppCompatActivity {
                 mConnectedPlayersView = findViewById(R.id.connected_players);
                 mConnectedPlayersView.setText(
                         String.format(getResources().getString(R.string.connected_players),
-                                        playerList.size())
+                                playerList.size())
                 );
                 Toast.makeText(WaitingRoomActivity.this, newPlayer + " connected", Toast.LENGTH_SHORT).show();
             }
 
             @Override
             public void onChildChanged(@NonNull DataSnapshot snapshot, @Nullable String previousChildName) {
-                // la schimbarea numelui jucatorului, actualizam ListView
-                String changedPlayer = snapshot.getValue(String.class);
+                if(disconnected == false) {
 
-                playerList.set(playerIndex - 1, changedPlayer);
-                arrayAdapter.notifyDataSetChanged();
+                    // la schimbarea numelui jucatorului, actualizam ListView
+                    String changedPlayer = snapshot.getValue(String.class);
+                    Integer modifiedIndex;
+                    if (previousChildName == null) {
+                        modifiedIndex = 0;
+                    } else {
+                        modifiedIndex = Integer.parseInt(previousChildName.substring(previousChildName.length() - 1));
+                    }
+
+                    playerList.set(modifiedIndex, changedPlayer);
+                    arrayAdapter.notifyDataSetChanged();
+
+                }
             }
 
             @Override
@@ -112,7 +125,6 @@ public class WaitingRoomActivity extends AppCompatActivity {
 
             @Override
             public void onCancelled(@NonNull DatabaseError error) {
-
             }
         });
 
@@ -136,7 +148,7 @@ public class WaitingRoomActivity extends AppCompatActivity {
                 //  =====
 
                 // determinare pozitie pentru player in lista
-                if(playerName == null) {
+                if (playerName == null) {
                     playerIndex = playerList.size() + 1;
                 }
                 // extragere nume din mInput
@@ -153,8 +165,22 @@ public class WaitingRoomActivity extends AppCompatActivity {
             }
         });
     }
-}
 
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+
+        disconnected = true;
+        playerList.remove(playerName);
+
+        HashMap<String, Object> map = new HashMap<>();
+
+        for(int i = 0; i < playerList.size(); i++) {
+            map.put("Player" + (i+1), playerList.get(i));
+        }
+        mPlayerReference.setValue(map);
+    }
+}
 /*
     TODO:
 
@@ -176,11 +202,18 @@ public class WaitingRoomActivity extends AppCompatActivity {
     alt nume
 
     - (varianta 2) Retinem care este numarul jucatorului, la selectarea altui nume modificam doar
-valoarea pentru jucatorul respectiv
+valoarea pentru jucatorul respectiv                 -- DONE
 
 
     Bonus:
 
     5. - Adaugam un TextView in care specificam cati jucatori s-au conectat    -- DONE
     6. - In onDestroy - eliminam utilizatorul din lista
+
+    OnDestroy:
+    -elimin numele meu din playerList
+    -parcurg playerlist si adaug fiecare player intr-un map cu cheia "Player<i+1>", unde i este
+    indicele elementului din playerList
+    - actualizez intrarea Players cu acel map (suprascriu)
+
  */
