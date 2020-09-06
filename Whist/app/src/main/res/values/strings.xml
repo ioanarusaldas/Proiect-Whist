@@ -3,4 +3,6 @@
     <string name="join_game">Join Game</string>
     <string name="enter_name">Enter name</string>
     <string name="connected_players">Connected Players (%1$d):</string>
+    <string name="connected_players_default_text">Connected Players (0):</string>
+    <string name="start_game_button_text">Start Game</string>
 </resources>

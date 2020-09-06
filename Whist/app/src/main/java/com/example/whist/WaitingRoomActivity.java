@@ -1,31 +1,29 @@
 package com.example.whist;
 
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
-import androidx.appcompat.app.AppCompatActivity;
-
 import android.app.Activity;
-import android.content.Context;
+import android.content.Intent;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.KeyEvent;
 import android.view.View;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.ArrayAdapter;
+import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
+
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.appcompat.app.AppCompatActivity;
 
 import com.google.firebase.database.ChildEventListener;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
-import com.google.firebase.database.Query;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 
@@ -35,6 +33,7 @@ public class WaitingRoomActivity extends AppCompatActivity {
     private ListView mPlayerNameList;
     private DatabaseReference mPlayerReference;
     private TextView mConnectedPlayersView;
+    private Button mStartButton;
 
     private final List<String> playerList = new ArrayList<>();
     // Se retine index-ul si numele jucatorului
@@ -51,7 +50,6 @@ public class WaitingRoomActivity extends AppCompatActivity {
         // ======
 
         mPlayerNameList = findViewById(R.id.player_name_list);
-
 
         // Create an ArrayAdapter from List
         final ArrayAdapter<String> arrayAdapter = new ArrayAdapter<>
@@ -79,11 +77,17 @@ public class WaitingRoomActivity extends AppCompatActivity {
                                 playerList.size())
                 );
                 Toast.makeText(WaitingRoomActivity.this, newPlayer + " connected", Toast.LENGTH_SHORT).show();
+
+                if (playerList.size() == 3) {
+                    mStartButton.setEnabled(true);
+                }
             }
 
             @Override
             public void onChildChanged(@NonNull DataSnapshot snapshot, @Nullable String previousChildName) {
-                if(disconnected == false) {
+
+                // daca NU ne-am deconectat (la modificarea unui nume de jucator: )
+                if (disconnected == false) {
 
                     // la schimbarea numelui jucatorului, actualizam ListView
                     String changedPlayer = snapshot.getValue(String.class);
@@ -96,6 +100,10 @@ public class WaitingRoomActivity extends AppCompatActivity {
 
                     playerList.set(modifiedIndex, changedPlayer);
                     arrayAdapter.notifyDataSetChanged();
+
+                    if (playerList.size() == 2) {
+                        mStartButton.setEnabled(false);
+                    }
 
                 }
             }
@@ -115,6 +123,10 @@ public class WaitingRoomActivity extends AppCompatActivity {
                         String.format(getResources().getString(R.string.connected_players),
                                 playerList.size())
                 );
+
+                if (playerList.size() == 2) {
+                    mStartButton.setEnabled(false);
+                }
 
                 Toast.makeText(WaitingRoomActivity.this, disconnectedPlayer + " disconnected", Toast.LENGTH_SHORT).show();
             }
@@ -147,23 +159,30 @@ public class WaitingRoomActivity extends AppCompatActivity {
 
                 //  =====
 
-                // determinare pozitie pentru player in lista
-                if (playerName == null) {
-                    playerIndex = playerList.size() + 1;
+                if (playerList.size() < 6) {
+                    // determinare pozitie pentru player in lista
+                    if (playerName == null) {
+                        playerIndex = playerList.size() + 1;
+                    }
+                    // extragere nume din mInput
+                    playerName = mInput.getText().toString();
+
+                    // mapare PlayerX -> numele extras
+                    HashMap<String, Object> map = new HashMap<>();
+                    map.put("Player" + playerIndex, playerName);
+
+                    // actualizare copii pentru intrarea Players
+                    mPlayerReference.updateChildren(map);
+                    mStartButton.setVisibility(Button.VISIBLE);
+                } else {
+                    Toast.makeText(WaitingRoomActivity.this, "Maximum number of players (6) reached!", Toast.LENGTH_SHORT).show();
                 }
-                // extragere nume din mInput
-                playerName = mInput.getText().toString();
-
-                // mapare PlayerX -> numele extras
-                HashMap<String, Object> map = new HashMap<>();
-                map.put("Player" + playerIndex, playerName);
-
-                // actualizare copii pentru intrarea Players
-                mPlayerReference.updateChildren(map);
 
                 return true;
             }
         });
+
+        mStartButton = findViewById(R.id.start_game_button);
     }
 
     @Override
@@ -175,45 +194,28 @@ public class WaitingRoomActivity extends AppCompatActivity {
 
         HashMap<String, Object> map = new HashMap<>();
 
-        for(int i = 0; i < playerList.size(); i++) {
-            map.put("Player" + (i+1), playerList.get(i));
+        for (int i = 0; i < playerList.size(); i++) {
+            map.put("Player" + (i + 1), playerList.get(i));
         }
         mPlayerReference.setValue(map);
     }
+
+    public void startGame(View view) {
+        // TODO: Atasam bundle cu informatii despre player (nume, index) la Intent
+
+//        Bundle b = new Bundle();
+//        b.putInt("pla");
+
+        Intent myIntent = new Intent(this, GameActivity.class);
+        startActivity(myIntent);
+    }
 }
-/*
-    TODO:
-
-    1. - In onCreate, extrage valoarea pentru intrarea "Players", se extrag numele
-    jucatorilor, se adauga in playerList si se actualizeaza arrayAdapter, pentru a se afisa
-    jucatorii deja conectati    --- DONE
-
-    2. - In onCreate se seteaza listener pe intrarea cu cheia "Players", astfel incat la orice
-    modificare a valorii intrarii sa se modifice si playerList (astfel lista de jucatori afisata
-    pe ecran sa se actualizeze in timp real     --- DONE
-
-    3. - Pe butonul de enter al tastaturii, adauga la cheia "Players", un Map de forma:
-    "Player1" -> X
-    "Player2" -> Y
-    unde Y este ceea ce a fost introdus in PlainText       --- DONE
-
-    4. Daca utilizatorul schimba numele?
-    - (varianta 1) Dupa apasarea butonului de Enter, dezactivam PlainText ca sa nu mai poata alege
-    alt nume
-
-    - (varianta 2) Retinem care este numarul jucatorului, la selectarea altui nume modificam doar
-valoarea pentru jucatorul respectiv                 -- DONE
 
 
-    Bonus:
+/* TODO:
 
-    5. - Adaugam un TextView in care specificam cati jucatori s-au conectat    -- DONE
-    6. - In onDestroy - eliminam utilizatorul din lista
+    Pornim activitatea celorlalti jucatori (folosind serverul)
+    Ne asiguram ca nu ramane nimeni in activitate fara sa se fi conectat
 
-    OnDestroy:
-    -elimin numele meu din playerList
-    -parcurg playerlist si adaug fiecare player intr-un map cu cheia "Player<i+1>", unde i este
-    indicele elementului din playerList
-    - actualizez intrarea Players cu acel map (suprascriu)
-
+    Facem chestia cu bundle
  */
