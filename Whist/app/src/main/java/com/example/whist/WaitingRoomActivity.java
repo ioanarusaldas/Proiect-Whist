@@ -25,6 +25,7 @@ import com.google.firebase.database.Query;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
 
 public class WaitingRoomActivity extends AppCompatActivity {
@@ -33,6 +34,10 @@ public class WaitingRoomActivity extends AppCompatActivity {
     private ListView mPlayerNameList;
     private DatabaseReference mPlayerReference;
     private TextView mConnectedPlayersView;
+
+    // Se retine index-ul si numele jucatorului
+    private String playerName;
+    private int playerIndex;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -74,7 +79,13 @@ public class WaitingRoomActivity extends AppCompatActivity {
             }
 
             @Override
-            public void onChildChanged(@NonNull DataSnapshot snapshot, @Nullable String previousChildName) {}
+            public void onChildChanged(@NonNull DataSnapshot snapshot, @Nullable String previousChildName) {
+                // la schimbarea numelui jucatorului, actualizam ListView
+                String changedPlayer = snapshot.getValue(String.class);
+
+                playerList.set(playerIndex - 1, changedPlayer);
+                arrayAdapter.notifyDataSetChanged();
+            }
 
             @Override
             public void onChildRemoved(@NonNull DataSnapshot snapshot) {
@@ -104,9 +115,8 @@ public class WaitingRoomActivity extends AppCompatActivity {
 
             }
         });
-        
 
-        // Set Listener on Input
+        // setare listener pe mInput
         mInput = findViewById(R.id.player_name);
         mInput.setOnEditorActionListener(new TextView.OnEditorActionListener() {
             @Override
@@ -123,8 +133,21 @@ public class WaitingRoomActivity extends AppCompatActivity {
                 }
                 imm.hideSoftInputFromWindow(view.getWindowToken(), 0);
 
-//                playerList.add(mInput.getText().toString());
-//                arrayAdapter.notifyDataSetChanged();
+                //  =====
+
+                // determinare pozitie pentru player in lista
+                if(playerName == null) {
+                    playerIndex = playerList.size() + 1;
+                }
+                // extragere nume din mInput
+                playerName = mInput.getText().toString();
+
+                // mapare PlayerX -> numele extras
+                HashMap<String, Object> map = new HashMap<>();
+                map.put("Player" + playerIndex, playerName);
+
+                // actualizare copii pentru intrarea Players
+                mPlayerReference.updateChildren(map);
 
                 return true;
             }
@@ -146,7 +169,7 @@ public class WaitingRoomActivity extends AppCompatActivity {
     3. - Pe butonul de enter al tastaturii, adauga la cheia "Players", un Map de forma:
     "Player1" -> X
     "Player2" -> Y
-    unde Y este ceea ce a fost introdus in PlainText
+    unde Y este ceea ce a fost introdus in PlainText       --- DONE
 
     4. Daca utilizatorul schimba numele?
     - (varianta 1) Dupa apasarea butonului de Enter, dezactivam PlainText ca sa nu mai poata alege
