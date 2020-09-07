@@ -21,4 +21,4 @@ In clasa WaitingRoomActivity:
 1. - In onCreate, se extrage valoarea pentru intrarea "Players", se extrag numele
     jucatorilor, se adauga in playerList si se actualizeaza arrayAdapter, pentru a se afisa jucatorii deja conectati
 2. - In onCreate se seteaza listener pe intrarea cu cheia "Players", astfel incat la orice modificare a valorii intrarii sa se modifice si playerList (astfel lista de jucatori afisata pe ecran se actualizeaza in timp real).
-3. - Am adaugat un TextView in care se specifica cati jucatori s-au conectat
+3. - Am adaugat un TextView in care se specifica cati jucatori s-au conectat.
