@@ -32,10 +32,11 @@ public class WaitingRoomActivity extends AppCompatActivity {
     private EditText mInput;
     private ListView mPlayerNameList;
     private DatabaseReference mPlayerReference;
+    private DatabaseReference mStatusReference;
     private TextView mConnectedPlayersView;
     private Button mStartButton;
 
-    private final List<String> playerList = new ArrayList<>();
+    private final ArrayList<String> playerList = new ArrayList<>();
     // Se retine index-ul si numele jucatorului
     private String playerName;
     private int playerIndex;
@@ -76,7 +77,6 @@ public class WaitingRoomActivity extends AppCompatActivity {
                         String.format(getResources().getString(R.string.connected_players),
                                 playerList.size())
                 );
-                Toast.makeText(WaitingRoomActivity.this, newPlayer + " connected", Toast.LENGTH_SHORT).show();
 
                 if (playerList.size() == 3) {
                     mStartButton.setEnabled(true);
@@ -86,7 +86,7 @@ public class WaitingRoomActivity extends AppCompatActivity {
             @Override
             public void onChildChanged(@NonNull DataSnapshot snapshot, @Nullable String previousChildName) {
 
-                // daca NU ne-am deconectat (la modificarea unui nume de jucator: )
+                // daca NU ne-am deconectat (la modificarea unui nume de jucator):
                 if (disconnected == false) {
 
                     // la schimbarea numelui jucatorului, actualizam ListView
@@ -117,6 +117,8 @@ public class WaitingRoomActivity extends AppCompatActivity {
                 playerList.remove(disconnectedPlayer);
                 arrayAdapter.notifyDataSetChanged();
 
+                playerIndex = playerList.indexOf(playerName);
+
                 // actualizare TextView-ul cu numarul de jucatori conectati
                 mConnectedPlayersView = findViewById(R.id.connected_players);
                 mConnectedPlayersView.setText(
@@ -127,8 +129,6 @@ public class WaitingRoomActivity extends AppCompatActivity {
                 if (playerList.size() == 2) {
                     mStartButton.setEnabled(false);
                 }
-
-                Toast.makeText(WaitingRoomActivity.this, disconnectedPlayer + " disconnected", Toast.LENGTH_SHORT).show();
             }
 
             @Override
@@ -174,7 +174,39 @@ public class WaitingRoomActivity extends AppCompatActivity {
                     // actualizare copii pentru intrarea Players
                     mPlayerReference.updateChildren(map);
                     mStartButton.setVisibility(Button.VISIBLE);
+
+                    // setare listener pentru intrarea "Status"
+                    mStatusReference = FirebaseDatabase.getInstance().getReference().child("Game").child("Status");
+                    mStatusReference.addChildEventListener(new ChildEventListener() {
+                        @Override
+                        public void onChildAdded(@NonNull DataSnapshot snapshot, @Nullable String previousChildName) {}
+
+                        @Override
+                        public void onChildChanged(@NonNull DataSnapshot snapshot, @Nullable String previousChildName) {
+                            String key = snapshot.getKey();
+                            String gameState = snapshot.getValue(String.class);
+
+                            // Daca altcineva a apasat butonul de start, acest lucru este semnalat de modificarea intrarii
+                            // "Status" - se creaza un intent si se porneste GameActivity
+                            if(key.equals("Started") && gameState.equals("True")) {
+                                Intent intent = new Intent(WaitingRoomActivity.this, GameActivity.class);
+                                intent.putExtra("myName", playerName);
+                                intent.putExtra("myIndex", playerIndex);
+                                startActivity(intent);
+                            }
+                        }
+
+                        @Override
+                        public void onChildRemoved(@NonNull DataSnapshot snapshot) {}
+
+                        @Override
+                        public void onChildMoved(@NonNull DataSnapshot snapshot, @Nullable String previousChildName) {}
+
+                        @Override
+                        public void onCancelled(@NonNull DatabaseError error) {}
+                    });
                 } else {
+                    // Restrictionam numarul maxim de jucatori la 6
                     Toast.makeText(WaitingRoomActivity.this, "Maximum number of players (6) reached!", Toast.LENGTH_SHORT).show();
                 }
 
@@ -185,10 +217,15 @@ public class WaitingRoomActivity extends AppCompatActivity {
         mStartButton = findViewById(R.id.start_game_button);
     }
 
+    /*
+        Daca inchidem activitatea, eliminam din baza de date jucatorul si notificam ceilalti jucatori
+        sa isi actualizeze UI-ul prin eliminarea noastra din lista
+     */
     @Override
     protected void onDestroy() {
         super.onDestroy();
 
+        // flag care indica ca modificarea bazei de date se realizeaza din cauza unei deconectari
         disconnected = true;
         playerList.remove(playerName);
 
@@ -200,22 +237,19 @@ public class WaitingRoomActivity extends AppCompatActivity {
         mPlayerReference.setValue(map);
     }
 
+    // metoda care porneste activitatea GameActivity si notifica si pe ceilalti jucatori sa o deschida
     public void startGame(View view) {
-        // TODO: Atasam bundle cu informatii despre player (nume, index) la Intent
 
-//        Bundle b = new Bundle();
-//        b.putInt("pla");
+        // actualizeaza intrarea Started cu true pentru a informa ceilalti jucatori ca jocul a inceput
+        HashMap<String, Object> map = new HashMap<>();
+        map.put("Started", "True");
+        mStatusReference.setValue(map);
 
-        Intent myIntent = new Intent(this, GameActivity.class);
-        startActivity(myIntent);
+        // incepere joc
+        Intent intent = new Intent(this, GameActivity.class);
+        intent.putExtra("myName", playerName);
+        intent.putExtra("myIndex", playerIndex);
+        intent.putStringArrayListExtra("players", playerList);
+        startActivity(intent);
     }
 }
-
-
-/* TODO:
-
-    Pornim activitatea celorlalti jucatori (folosind serverul)
-    Ne asiguram ca nu ramane nimeni in activitate fara sa se fi conectat
-
-    Facem chestia cu bundle
- */
