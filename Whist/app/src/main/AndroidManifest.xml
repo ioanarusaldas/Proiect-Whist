@@ -11,6 +11,7 @@
         android:theme="@style/AppTheme">
         <activity
             android:name=".GameActivity"
+            android:theme="@style/Theme.AppCompat.DayNight.NoActionBar"
             android:screenOrientation="landscape"/>
         <activity android:name=".WaitingRoomActivity" />
         <activity android:name=".MainActivity">

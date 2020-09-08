@@ -6,6 +6,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:padding="16dp"
+    android:theme="@android:style/Theme.NoTitleBar"
     tools:context="com.example.whist.GameActivity">
 
 <!--    <TabLayout-->

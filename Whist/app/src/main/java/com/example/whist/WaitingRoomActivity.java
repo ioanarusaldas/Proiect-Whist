@@ -192,6 +192,7 @@ public class WaitingRoomActivity extends AppCompatActivity {
                                 Intent intent = new Intent(WaitingRoomActivity.this, GameActivity.class);
                                 intent.putExtra("myName", playerName);
                                 intent.putExtra("myIndex", playerIndex);
+                                intent.putStringArrayListExtra("players", playerList);
                                 startActivity(intent);
                             }
                         }
