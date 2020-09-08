@@ -45,6 +45,8 @@ public class GameActivity extends AppCompatActivity {
 
         //////////////////////////////////////////////////////////////////////
 
+        //implementare tab game + score
+
         TabLayout tabLayout = (TabLayout) findViewById(R.id.tabLayout);
         TabItem tab1 = findViewById(R.id.tab1);
         TabItem tab2 = findViewById(R.id.tab2);
@@ -144,6 +146,9 @@ public class GameActivity extends AppCompatActivity {
             - adaugare de elemente pentru a intreba utilizatorul cate maini crede ca va lua
             - setare listeneri corespunzatori astfel incat dupa ce un utilizator a spus cate maini va lua,
             urmatorul sa fie intrebat
+            -De rectificat problema afisarii cartilor
+            -De facut tabel
+            -De facut tabbarul sa dispara/apara la swipe
 
         */
     }

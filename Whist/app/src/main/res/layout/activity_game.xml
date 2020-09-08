@@ -5,7 +5,6 @@
     android:id="@+id/activity_main"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:padding="16dp"
     android:theme="@android:style/Theme.NoTitleBar"
     tools:context="com.example.whist.GameActivity">
 
@@ -13,7 +12,7 @@
         android:id="@+id/tabLayout"
         style="@style/MyTabLayout"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_height="30dp"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         app:tabIndicatorColor="@color/colorPrimaryDark"

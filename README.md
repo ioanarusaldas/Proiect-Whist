@@ -50,3 +50,11 @@ cartilor de joc
 - se trimite la server aceasta permutare
 - am adaugat un listener pe intrarea corespunzatoare player-ului care (momentan)
 face un Log la cartile primite
+
+
+08.09 Irina + Miruna + Sergiu  + Rusalda 
+-iconita aplicatie
+-rezolvat bug program
+-incarcare drawable carti
+-realizare tab-uri GAME/SCORE
+-Afisare carti in aplicatie
