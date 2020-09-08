@@ -18,7 +18,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void shuffleCards(View view) {
-        ArrayList<String> cards = CardShuffler.shuffleCards(4);
+        ArrayList<Integer> cards = CardShuffler.shuffleCards(4);
 
         Log.d("Player 1", cards.subList(0, 8).toString());
         Log.d("Player 2", cards.subList(8, 16).toString());

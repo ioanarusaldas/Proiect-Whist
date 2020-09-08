@@ -7,8 +7,13 @@ import androidx.viewpager.widget.PagerAdapter;
 import androidx.viewpager.widget.ViewPager;
 
 import android.content.Intent;
+import android.content.res.Resources;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.View;
+import android.view.ViewGroup;
+import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.Toast;
 
 import com.google.android.material.tabs.TabItem;
@@ -101,7 +106,7 @@ public class GameActivity extends AppCompatActivity {
         // Afisare carti
         if (currentPlayerIndex + 1 == myIndex) {
             // Amestecare carti + trimitere la server
-            ArrayList<String> shuffledCards = CardShuffler.shuffleCards(playerCount);
+            ArrayList<Integer> shuffledCards = CardShuffler.shuffleCards(playerCount);
 
             Map<String, Object> map = new HashMap<>();
 
@@ -119,13 +124,26 @@ public class GameActivity extends AppCompatActivity {
         // Setare listener pe intrarea Player <indicele meu>
         DatabaseReference myPlayerReference = turnReference.child("Player" + myIndex);
         myPlayerReference.addChildEventListener(new ChildEventListener() {
-            // Extrag cartile mele de la intrarea mea si le afisez pe ecran
+
             @Override
             public void onChildAdded(@NonNull DataSnapshot snapshot, @Nullable String previousChildName) {
-                GenericTypeIndicator<ArrayList<String>> t = new GenericTypeIndicator<ArrayList<String>>() {};
-                ArrayList<String> myCards = snapshot.getValue(t);
+                // Extragere carti de la intrarea Player cu indicele jucatorului curent
+                GenericTypeIndicator<ArrayList<Integer>> t = new GenericTypeIndicator<ArrayList<Integer>>() {};
+                ArrayList<Integer> myCards = snapshot.getValue(t);
 
-                Log.d("myCards", myCards.toString());
+                // Introducere carti pe slot-urile libere din fragment_game_tab.xml
+                for(int i = 0; i < myCards.size(); i++) {
+                    // extragere id al slot-ului
+                    int resId = getResources().getIdentifier(
+                            "card_slot_" + (i+1),
+                            "id",
+                            GameActivity.this.getPackageName()
+                    );
+
+                    ImageView card = findViewById(resId);
+                    // setare resursa pe slot
+                    card.setImageResource(myCards.get(i));
+                }
             }
 
             @Override
