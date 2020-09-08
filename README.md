@@ -58,3 +58,6 @@ face un Log la cartile primite
 -incarcare drawable carti
 -realizare tab-uri GAME/SCORE
 -Afisare carti in aplicatie
+
+09.09 Sergiu + Rusalda
+- asezare corecta a cartilor pe ecran
