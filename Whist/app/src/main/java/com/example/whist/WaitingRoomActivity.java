@@ -159,7 +159,7 @@ public class WaitingRoomActivity extends AppCompatActivity {
 
                 //  =====
 
-                if (playerList.size() < 6) {
+               if (playerList.size() < 6) {
                     // determinare pozitie pentru player in lista
                     if (playerName == null) {
                         playerIndex = playerList.size() + 1;
