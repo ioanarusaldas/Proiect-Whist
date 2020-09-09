@@ -2,63 +2,167 @@ package com.example.whist;
 
 import android.os.Bundle;
 
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
+import android.widget.TextView;
 
-/**
- * A simple {@link Fragment} subclass.
- * Use the {@link GameTab#newInstance} factory method to
- * create an instance of this fragment.
- */
+import com.google.firebase.database.ChildEventListener;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.GenericTypeIndicator;
+
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
+
 public class GameTab extends Fragment {
 
-    // TODO: Rename parameter arguments, choose names that match
-    // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
-    private static final String ARG_PARAM1 = "param1";
-    private static final String ARG_PARAM2 = "param2";
-
-    // TODO: Rename and change types of parameters
-    private String mParam1;
-    private String mParam2;
+    private ArrayList<String> players;
+    private int myIndex;
+    private DatabaseReference turnReference;
+    private int playerCount;
 
     public GameTab() {
         // Required empty public constructor
-    }
-
-    /**
-     * Use this factory method to create a new instance of
-     * this fragment using the provided parameters.
-     *
-     * @param param1 Parameter 1.
-     * @param param2 Parameter 2.
-     * @return A new instance of fragment GameTab.
-     */
-    // TODO: Rename and change types and number of parameters
-    public static GameTab newInstance(String param1, String param2) {
-        GameTab fragment = new GameTab();
-        Bundle args = new Bundle();
-        args.putString(ARG_PARAM1, param1);
-        args.putString(ARG_PARAM2, param2);
-        fragment.setArguments(args);
-        return fragment;
     }
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         if (getArguments() != null) {
-            mParam1 = getArguments().getString(ARG_PARAM1);
-            mParam2 = getArguments().getString(ARG_PARAM2);
+            players = getArguments().getStringArrayList("players");
+            myIndex = getArguments().getInt("myIndex");
+            playerCount = players.size();
         }
+
+        turnReference = FirebaseDatabase.getInstance().getReference().child("Game").child("Turn");
     }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.fragment_game_tab, container, false);
+        View rootView = inflater.inflate(R.layout.fragment_game_tab, container, false);
+
+
+        // setare nume playeri
+        if(players.size() == 4) {
+            setPlayerNames(rootView);
+        } else {
+            TextView tv = rootView.findViewById(R.id.middle_layout);
+            tv.setText("Numele jucatorilor este setat doar in jocurile cu 4 jucatori");
+        }
+
+        // metoda prin care se ruleaza jocul
+        runGame(rootView);
+
+        return rootView;
+    }
+
+    // metoda care extrage textview-urile din fragment_game_tab si seteaza numele jucatorilor
+    private void setPlayerNames(View rootView) {
+        TextView playerLeft = rootView.findViewById(R.id.player_left_name);
+        TextView playerCenter = rootView.findViewById(R.id.player_center_name);
+        TextView playerRight = rootView.findViewById(R.id.player_right_name);
+
+        switch(myIndex) {
+            case 1:
+                playerLeft.setText(players.get(1));
+                playerCenter.setText(players.get(2));
+                playerRight.setText(players.get(3));
+                break;
+            case 2:
+                playerLeft.setText(players.get(0));
+                playerCenter.setText(players.get(2));
+                playerRight.setText(players.get(3));
+                break;
+            case 3:
+                playerLeft.setText(players.get(0));
+                playerCenter.setText(players.get(1));
+                playerRight.setText(players.get(3));
+                break;
+            case 4:
+                playerLeft.setText(players.get(0));
+                playerCenter.setText(players.get(1));
+                playerRight.setText(players.get(2));
+                break;
+        }
+    }
+
+    private void runGame(View rootView) {
+
+        // (Momentan) se realizeaza jocurile de 8
+        for (int i = 0; i < players.size(); i++) {
+            turn(i, 8, rootView);
+        }
+    }
+
+
+    public void turn(final int currentPlayerIndex, int gameType, final View rootView) {
+
+        // Afisare carti
+        if (currentPlayerIndex + 1 == myIndex) {
+            // Amestecare carti + trimitere la server
+            ArrayList<Integer> shuffledCards = CardShuffler.shuffleCards(playerCount);
+
+            Map<String, Object> map = new HashMap<>();
+
+            // Pun pentru fiecare player intr-un map un sublist al listei de carti amestecate
+            // (8 carti pentru Player1, urmatoarele 8 carti pentru Player2, etc)
+            for (int i = 0; i < players.size(); i++) {
+                map.put("Cards", shuffledCards.subList(gameType * i, gameType * (i + 1)));
+
+                // Trimitere la server
+                DatabaseReference currPlayerReference = turnReference.child("Player" + (i + 1));
+                currPlayerReference.updateChildren(map);
+            }
+        }
+
+        // Setare listener pe intrarea Player <indicele meu>
+        DatabaseReference myPlayerReference = turnReference.child("Player" + myIndex);
+        myPlayerReference.addChildEventListener(new ChildEventListener() {
+
+            @Override
+            public void onChildAdded(@NonNull DataSnapshot snapshot, @Nullable String previousChildName) {
+                // Extragere carti de la intrarea Player cu indicele jucatorului curent
+                GenericTypeIndicator<ArrayList<Integer>> t = new GenericTypeIndicator<ArrayList<Integer>>() {};
+                ArrayList<Integer> myCards = snapshot.getValue(t);
+
+                // Introducere carti pe slot-urile libere din fragment_game_tab.xml
+                for (int i = 0; i < myCards.size(); i++) {
+                    // extragere id al slot-ului
+                    int resId = getResources().getIdentifier(
+                            "card_slot_" + (i + 1),
+                            "id",
+                            getActivity().getPackageName()
+                    );
+
+                    ImageView card = rootView.findViewById(resId);
+                    // setare resursa pe slot
+                    card.setImageResource(myCards.get(i));
+                }
+            }
+
+            @Override
+            public void onChildChanged(@NonNull DataSnapshot snapshot, @Nullable String previousChildName) {}
+
+            @Override
+            public void onChildRemoved(@NonNull DataSnapshot snapshot) {}
+
+            @Override
+            public void onChildMoved(@NonNull DataSnapshot snapshot, @Nullable String previousChildName) {}
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {}
+        });
     }
 }

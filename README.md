@@ -53,11 +53,16 @@ face un Log la cartile primite
 
 
 08.09 Irina + Miruna + Sergiu  + Rusalda 
--iconita aplicatie
--rezolvat bug program
--incarcare drawable carti
--realizare tab-uri GAME/SCORE
--Afisare carti in aplicatie
+- iconita aplicatie
+- rezolvat bug program
+- incarcare drawable carti
+- realizare tab-uri GAME/SCORE
+- Afisare carti in aplicatie
 
-09.09 Sergiu + Rusalda
+09.09 - Sergiu + Rusalda
 - asezare corecta a cartilor pe ecran
+
+09.09 - Sergiu
+- Mutare metode runGame si turn in GameTab
+- adaugare avatare adversari in partea de sus a ecranului jocului
+- se afiseaza numele adversarilor pentru jocurile de 4
