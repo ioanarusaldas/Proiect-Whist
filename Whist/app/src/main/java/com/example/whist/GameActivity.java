@@ -8,15 +8,15 @@ import androidx.viewpager.widget.PagerAdapter;
 import androidx.viewpager.widget.ViewPager;
 
 import com.google.android.material.tabs.TabLayout;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
 
 import java.util.ArrayList;
 
 public class GameActivity extends AppCompatActivity {
 
     // Date despre jucatorul curent
-    private String myName;
     private Integer myIndex;
-
     // Date despre ceilalti jucatori
     private ArrayList<String> players;
 
@@ -30,7 +30,6 @@ public class GameActivity extends AppCompatActivity {
         // Extragere continut din Bundle
         Intent intent = getIntent();
         Bundle b = intent.getExtras();
-        myName = b.getString("myName");
         myIndex = b.getInt("myIndex");
         players = b.getStringArrayList("players");
 
@@ -38,7 +37,7 @@ public class GameActivity extends AppCompatActivity {
         // Setare listener pe tab-uri
         TabLayout tabLayout = (TabLayout) findViewById(R.id.tabLayout);
         final ViewPager viewPager = (ViewPager) findViewById(R.id.View_pager);
-        PagerAdapter pagerAdapter = new PageAdapter(getSupportFragmentManager(),tabLayout.getTabCount(), players, myIndex);
+        PagerAdapter pagerAdapter = new PageAdapter(getSupportFragmentManager(), tabLayout.getTabCount(), players, myIndex);
         viewPager.setAdapter(pagerAdapter);
         tabLayout.addOnTabSelectedListener(new TabLayout.OnTabSelectedListener() {
             @Override
@@ -47,15 +46,24 @@ public class GameActivity extends AppCompatActivity {
             }
 
             @Override
-            public void onTabUnselected(TabLayout.Tab tab) {}
+            public void onTabUnselected(TabLayout.Tab tab) {
+            }
 
             @Override
-            public void onTabReselected(TabLayout.Tab tab) {}
+            public void onTabReselected(TabLayout.Tab tab) {
+            }
         });
     }
 
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
 
-        /* TODO:
+        DatabaseReference statusReference = FirebaseDatabase.getInstance().getReference()
+                .child("Game").child("Status").child("Started");
+        statusReference.setValue("False");
+    }
+/* TODO:
             - adaugare de elemente pentru a intreba utilizatorul cate maini crede ca va lua
             - setare listeneri corespunzatori astfel incat dupa ce un utilizator a spus cate maini va lua,
             urmatorul sa fie intrebat

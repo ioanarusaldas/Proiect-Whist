@@ -3,6 +3,7 @@ package com.example.whist;
 import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.KeyEvent;
 import android.view.View;
 import android.view.inputmethod.InputMethodManager;
@@ -185,12 +186,11 @@ public class WaitingRoomActivity extends AppCompatActivity {
                         public void onChildChanged(@NonNull DataSnapshot snapshot, @Nullable String previousChildName) {
                             String key = snapshot.getKey();
                             String gameState = snapshot.getValue(String.class);
-
                             // Daca altcineva a apasat butonul de start, acest lucru este semnalat de modificarea intrarii
                             // "Status" - se creaza un intent si se porneste GameActivity
                             if(key.equals("Started") && gameState.equals("True")) {
+
                                 Intent intent = new Intent(WaitingRoomActivity.this, GameActivity.class);
-                                intent.putExtra("myName", playerName);
                                 intent.putExtra("myIndex", playerIndex);
                                 intent.putStringArrayListExtra("players", playerList);
                                 startActivity(intent);
@@ -248,7 +248,6 @@ public class WaitingRoomActivity extends AppCompatActivity {
 
         // incepere joc
         Intent intent = new Intent(this, GameActivity.class);
-        intent.putExtra("myName", playerName);
         intent.putExtra("myIndex", playerIndex);
         intent.putStringArrayListExtra("players", playerList);
         startActivity(intent);

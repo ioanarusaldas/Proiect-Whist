@@ -1,5 +1,20 @@
 # Proiect-Whist
 
+Neclaritati:
+
+- In fragmentul GameTab am pus un while ca sa asteptam pana cand metoda
+getActivity() nu mai intoarcee null. Exista vreo metoda alternativa de a
+aborda situatia?
+- De ce callbackurile din waiting room activity se apeleaza de 2 ori?
+(presupunem ca asta este motivul pentru care activitatea jocului pare sa
+se creeze de 2 ori - e nevoie sa apasam pe butonul de back de 2 ori ca sa
+ne intoarcem in waiting room)
+- Cum transmitem informatii de la un tab la altul?
+(GameTab -> ScoreTab)
+
+
+===============================================================================
+
 04.09 - Sergiu
 
 - Adaugat o clasa CardShuffler care genereaza o permutare a cartilor de joc
@@ -66,3 +81,6 @@ face un Log la cartile primite
 - Mutare metode runGame si turn in GameTab
 - adaugare avatare adversari in partea de sus a ecranului jocului
 - se afiseaza numele adversarilor pentru jocurile de 4
+
+10.09 - Sergiu + Rusalda
+- fixat bug-uri la conectarea jucatorilor

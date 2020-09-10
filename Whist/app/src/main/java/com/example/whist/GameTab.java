@@ -1,5 +1,6 @@
 package com.example.whist;
 
+import android.content.Context;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
@@ -10,6 +11,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.GridLayout;
 import android.widget.ImageView;
 import android.widget.TextView;
 
@@ -31,6 +33,8 @@ public class GameTab extends Fragment {
     private DatabaseReference turnReference;
     private int playerCount;
 
+    private View rootView;
+
     public GameTab() {
         // Required empty public constructor
     }
@@ -45,23 +49,20 @@ public class GameTab extends Fragment {
         }
 
         turnReference = FirebaseDatabase.getInstance().getReference().child("Game").child("Turn");
+
     }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
-        View rootView = inflater.inflate(R.layout.fragment_game_tab, container, false);
+        rootView = inflater.inflate(R.layout.fragment_game_tab, container, false);
 
 
         // setare nume playeri
         if(players.size() == 4) {
             setPlayerNames(rootView);
-        } else {
-            TextView tv = rootView.findViewById(R.id.middle_layout);
-            tv.setText("Numele jucatorilor este setat doar in jocurile cu 4 jucatori");
         }
-
         // metoda prin care se ruleaza jocul
         runGame(rootView);
 
@@ -137,10 +138,14 @@ public class GameTab extends Fragment {
                 GenericTypeIndicator<ArrayList<Integer>> t = new GenericTypeIndicator<ArrayList<Integer>>() {};
                 ArrayList<Integer> myCards = snapshot.getValue(t);
 
+                // carpeala - asteptam pana cand fragmentul este atasat de activitate
+                while(getActivity() == null);
+
                 // Introducere carti pe slot-urile libere din fragment_game_tab.xml
                 for (int i = 0; i < myCards.size(); i++) {
                     // extragere id al slot-ului
-                    int resId = getResources().getIdentifier(
+
+                    int resId = getActivity().getResources().getIdentifier(
                             "card_slot_" + (i + 1),
                             "id",
                             getActivity().getPackageName()
@@ -164,5 +169,11 @@ public class GameTab extends Fragment {
             @Override
             public void onCancelled(@NonNull DatabaseError error) {}
         });
+    }
+
+    @Override
+    public void onAttach(@NonNull Context context) {
+        super.onAttach(context);
+
     }
 }
