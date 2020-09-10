@@ -18,7 +18,8 @@
         android:columnCount="5">
 
         <LinearLayout
-            android:layout_width="50dp"
+            android:id="@+id/layout1"
+            android:layout_width="80dp"
             android:layout_height="match_parent"
             android:layout_column="0"
             android:layout_columnWeight="1"
@@ -26,14 +27,14 @@
             android:orientation="vertical">
 
             <ImageView
-                android:id="@+id/player_left_avatar"
+                android:id="@+id/player1_avatar"
                 android:layout_width="match_parent"
                 android:layout_height="0dp"
                 android:layout_weight="0.75"
-                android:src="@drawable/avatar_1" />
+                android:src="@drawable/koala" />
 
             <TextView
-                android:id="@+id/player_left_name"
+                android:id="@+id/player1_name"
                 android:layout_width="match_parent"
                 android:layout_height="0dp"
                 android:layout_weight="0.25"
@@ -44,7 +45,8 @@
         </LinearLayout>
 
         <LinearLayout
-            android:layout_width="50dp"
+            android:id="@+id/layout2"
+            android:layout_width="80dp"
             android:layout_height="match_parent"
             android:layout_column="1"
             android:layout_columnWeight="1"
@@ -52,14 +54,14 @@
             android:orientation="vertical">
 
             <ImageView
-                android:id="@+id/player_center_avatar"
+                android:id="@+id/player2_avatar"
                 android:layout_width="match_parent"
                 android:layout_height="0dp"
                 android:layout_weight="0.75"
-                android:src="@drawable/avatar_2" />
+                android:src="@drawable/monkey" />
 
             <TextView
-                android:id="@+id/player_center_name"
+                android:id="@+id/player2_name"
                 android:layout_width="match_parent"
                 android:layout_height="0dp"
                 android:layout_weight="0.25"
@@ -69,7 +71,8 @@
         </LinearLayout>
 
         <LinearLayout
-            android:layout_width="50dp"
+            android:id="@+id/layout3"
+            android:layout_width="80dp"
             android:layout_height="match_parent"
             android:layout_column="2"
             android:layout_columnWeight="1"
@@ -77,14 +80,14 @@
             android:orientation="vertical">
 
             <ImageView
-                android:id="@+id/player_right_avatar"
+                android:id="@+id/player3_avatar"
                 android:layout_width="match_parent"
                 android:layout_height="0dp"
                 android:layout_weight="0.75"
-                android:src="@drawable/avatar_3" />
+                android:src="@drawable/lion" />
 
             <TextView
-                android:id="@+id/player_right_name"
+                android:id="@+id/player3_name"
                 android:layout_width="match_parent"
                 android:layout_height="0dp"
                 android:layout_weight="0.25"
@@ -95,7 +98,8 @@
 
 
         <LinearLayout
-            android:layout_width="50dp"
+            android:id="@+id/layout4"
+            android:layout_width="80dp"
             android:layout_height="match_parent"
             android:layout_column="3"
             android:layout_columnWeight="1"
@@ -103,14 +107,14 @@
             android:orientation="vertical">
 
             <ImageView
-                android:id="@+id/player_test"
+                android:id="@+id/player4_avatar"
                 android:layout_width="match_parent"
                 android:layout_height="0dp"
                 android:layout_weight="0.75"
-                android:background="@android:color/black" />
+                android:src="@drawable/giraffe"/>
 
             <TextView
-                android:id="@+id/player_test2"
+                android:id="@+id/player4_name"
                 android:layout_width="match_parent"
                 android:layout_height="0dp"
                 android:layout_weight="0.25"
@@ -121,7 +125,8 @@
 
 
         <LinearLayout
-            android:layout_width="50dp"
+            android:id="@+id/layout5"
+            android:layout_width="80dp"
             android:layout_height="match_parent"
             android:layout_column="4"
             android:layout_columnWeight="1"
@@ -129,14 +134,14 @@
             android:orientation="vertical">
 
             <ImageView
-                android:id="@+id/player_test3"
+                android:id="@+id/player5_avatar"
                 android:layout_width="match_parent"
                 android:layout_height="0dp"
                 android:layout_weight="0.75"
-                android:background="@android:color/white" />
+                android:src="@drawable/tiger" />
 
             <TextView
-                android:id="@+id/player_test4"
+                android:id="@+id/player5_name"
                 android:layout_width="match_parent"
                 android:layout_height="0dp"
                 android:layout_weight="0.25"

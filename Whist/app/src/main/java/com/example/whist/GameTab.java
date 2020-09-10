@@ -13,6 +13,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.GridLayout;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.google.firebase.database.ChildEventListener;
@@ -24,7 +25,9 @@ import com.google.firebase.database.GenericTypeIndicator;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.LinkedList;
 import java.util.Map;
+import java.util.Queue;
 
 public class GameTab extends Fragment {
 
@@ -60,9 +63,11 @@ public class GameTab extends Fragment {
 
 
         // setare nume playeri
-        if(players.size() == 4) {
-            setPlayerNames(rootView);
-        }
+
+        setPlayerNames(rootView);
+        // ascundere avatari nefolositori
+        hidePlayerAvatars(rootView);
+
         // metoda prin care se ruleaza jocul
         runGame(rootView);
 
@@ -71,30 +76,46 @@ public class GameTab extends Fragment {
 
     // metoda care extrage textview-urile din fragment_game_tab si seteaza numele jucatorilor
     private void setPlayerNames(View rootView) {
-        TextView playerLeft = rootView.findViewById(R.id.player_left_name);
-        TextView playerCenter = rootView.findViewById(R.id.player_center_name);
-        TextView playerRight = rootView.findViewById(R.id.player_right_name);
 
-        switch(myIndex) {
-            case 1:
-                playerLeft.setText(players.get(1));
-                playerCenter.setText(players.get(2));
-                playerRight.setText(players.get(3));
-                break;
-            case 2:
-                playerLeft.setText(players.get(0));
-                playerCenter.setText(players.get(2));
-                playerRight.setText(players.get(3));
-                break;
+        int index = 0;
+
+        ArrayList<TextView> playerTextView = new ArrayList<>(5);
+        playerTextView.add((TextView) rootView.findViewById(R.id.player1_name));
+        playerTextView.add((TextView) rootView.findViewById(R.id.player2_name));
+        playerTextView.add((TextView) rootView.findViewById(R.id.player3_name));
+        playerTextView.add((TextView) rootView.findViewById(R.id.player4_name));
+        playerTextView.add((TextView) rootView.findViewById(R.id.player5_name));
+
+        for (int i = 0; i < players.size(); i++) {
+            if ((i + 1) != myIndex) {
+                playerTextView.get(index++).setText(players.get(i));
+            }
+        }
+    }
+
+    // metoda care extrage layout-urile din fragment_game_tab si le asunde pe cele nefolositoare
+    private void hidePlayerAvatars(View rootView) {
+
+        ArrayList<LinearLayout> playerLinearLayout = new ArrayList<>(5);
+        playerLinearLayout.add((LinearLayout) rootView.findViewById(R.id.layout1));
+        playerLinearLayout.add((LinearLayout) rootView.findViewById(R.id.layout2));
+        playerLinearLayout.add((LinearLayout) rootView.findViewById(R.id.layout3));
+        playerLinearLayout.add((LinearLayout) rootView.findViewById(R.id.layout4));
+        playerLinearLayout.add((LinearLayout) rootView.findViewById(R.id.layout5));
+
+
+        switch (playerCount) {
             case 3:
-                playerLeft.setText(players.get(0));
-                playerCenter.setText(players.get(1));
-                playerRight.setText(players.get(3));
+                playerLinearLayout.get(2).setVisibility(View.GONE);
+                playerLinearLayout.get(3).setVisibility(View.GONE);
+                playerLinearLayout.get(4).setVisibility(View.GONE);
                 break;
             case 4:
-                playerLeft.setText(players.get(0));
-                playerCenter.setText(players.get(1));
-                playerRight.setText(players.get(2));
+                playerLinearLayout.get(3).setVisibility(View.GONE);
+                playerLinearLayout.get(4).setVisibility(View.GONE);
+                break;
+            case 5:
+                playerLinearLayout.get(4).setVisibility(View.GONE);
                 break;
         }
     }
@@ -135,11 +156,12 @@ public class GameTab extends Fragment {
             @Override
             public void onChildAdded(@NonNull DataSnapshot snapshot, @Nullable String previousChildName) {
                 // Extragere carti de la intrarea Player cu indicele jucatorului curent
-                GenericTypeIndicator<ArrayList<Integer>> t = new GenericTypeIndicator<ArrayList<Integer>>() {};
+                GenericTypeIndicator<ArrayList<Integer>> t = new GenericTypeIndicator<ArrayList<Integer>>() {
+                };
                 ArrayList<Integer> myCards = snapshot.getValue(t);
 
                 // carpeala - asteptam pana cand fragmentul este atasat de activitate
-                while(getActivity() == null);
+                while (getActivity() == null) ;
 
                 // Introducere carti pe slot-urile libere din fragment_game_tab.xml
                 for (int i = 0; i < myCards.size(); i++) {
@@ -158,16 +180,20 @@ public class GameTab extends Fragment {
             }
 
             @Override
-            public void onChildChanged(@NonNull DataSnapshot snapshot, @Nullable String previousChildName) {}
+            public void onChildChanged(@NonNull DataSnapshot snapshot, @Nullable String previousChildName) {
+            }
 
             @Override
-            public void onChildRemoved(@NonNull DataSnapshot snapshot) {}
+            public void onChildRemoved(@NonNull DataSnapshot snapshot) {
+            }
 
             @Override
-            public void onChildMoved(@NonNull DataSnapshot snapshot, @Nullable String previousChildName) {}
+            public void onChildMoved(@NonNull DataSnapshot snapshot, @Nullable String previousChildName) {
+            }
 
             @Override
-            public void onCancelled(@NonNull DatabaseError error) {}
+            public void onCancelled(@NonNull DatabaseError error) {
+            }
         });
     }
 
