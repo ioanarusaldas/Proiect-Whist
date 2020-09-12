@@ -98,7 +98,7 @@ public class GameTab extends Fragment {
             b.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
-                    // extragem valoarea in functie de butonul apasam
+                    // extragem valoarea in functie de butonul apasat
                     // adaugam valoarea la lista bids
                     Button b = (Button) view;
                     Integer value = Integer.parseInt(b.getText().toString());
@@ -108,8 +108,7 @@ public class GameTab extends Fragment {
                     bidLayout.setVisibility(View.INVISIBLE);
 
                     // setam bid-ul in baza de date
-                    String valueBid = bids.get(bids.size() - 1).toString();
-                    bidReference.child("Player" + myIndex).setValue(valueBid);
+                    bidReference.child("Player" + myIndex).setValue(value);
 
                     // setam valoarea "Current" in baza de date pentru persoana urmatoare
                     // daca toata lumea a pariat, setam bid = true pentru a trece la partea de dat carti
@@ -176,10 +175,6 @@ public class GameTab extends Fragment {
         // (Momentan) se realizeaza un joc de 8
         turn(0, 8, rootView);
 
-        // pe viitor: jocuri de 8 + restul
-//        for (int i = 0; i < players.size(); i++) {
-//            turn(i, 8, rootView);
-//        }
     }
 
 
@@ -196,13 +191,19 @@ public class GameTab extends Fragment {
             for (int i = 0; i < players.size(); i++) {
                 map.put("Cards", shuffledCards.subList(gameType * i, gameType * (i + 1)));
 
-                // Trimitere la server playeri
+                // Trimitere la server playeri cu cartile lor amestecate
                 DatabaseReference currPlayerReference = turnReference.child("Player" + (i + 1));
                 currPlayerReference.updateChildren(map);
 
                 // Trimitere la server Bids
-                bidReference.child("Player" + (i + 1)).setValue("Pending");
+                if(i != currentPlayerIndex) {
+                    bidReference.child("Player" + (i + 1)).setValue("Pending");
+                }
+
             }
+
+            // setam pe intrarea jucatorului curent faptul ca el este cel care trebuie sa aleaga
+            bidReference.child("Player" + (currentPlayerIndex + 1)).setValue("Current");
         }
 
         // Setare listener pe intrarea Player <indicele meu>
@@ -256,7 +257,23 @@ public class GameTab extends Fragment {
         // setare listener pe bidReference
         bidReference.addChildEventListener(new ChildEventListener() {
             @Override
-            public void onChildAdded(@NonNull DataSnapshot snapshot, @Nullable String previousChildName) {}
+            public void onChildAdded(@NonNull DataSnapshot snapshot, @Nullable String previousChildName) {
+                String key = snapshot.getKey();
+                String result = snapshot.getValue(String.class);
+
+                if(key.equals("Player" + (myIndex)) && result.equals("Current")) {
+
+                    // setam vizibilitatea layout-ului din mijloc pe true
+                    LinearLayout bidLayout = (LinearLayout) rootView.findViewById(R.id.bid_layout);
+                    bidLayout.setVisibility(View.VISIBLE);
+
+                } else {
+                    // adaugam in arraylist valorile numerice
+                    if(result.equals("Current") == false && result.equals("Pending") == false) {
+                        bids.add(Integer.parseInt(result));
+                    }
+                }
+            }
 
             @Override
             public void onChildChanged(@NonNull DataSnapshot snapshot, @Nullable String previousChildName) {
@@ -274,7 +291,7 @@ public class GameTab extends Fragment {
 
                 } else {
                     // adaugam in arraylist valorile numerice
-                    if(result.equals("Current") == false) {
+                    if(result.equals("Current") == false && result.equals("Pending") == false) {
                         bids.add(Integer.parseInt(result));
                     }
                 }
@@ -289,10 +306,6 @@ public class GameTab extends Fragment {
             @Override
             public void onCancelled(@NonNull DatabaseError error) {}
         });
-
-        // setam pe intrarea jucatorului curent faptul ca el este cel care trebuie sa aleaga
-        bidReference.child("Player" + (currentPlayerIndex + 1)).setValue("Current");
-
 
         ////////////////////////////////////////////////////////////////////////////////////////////
         // TODO: De testat partea de turn

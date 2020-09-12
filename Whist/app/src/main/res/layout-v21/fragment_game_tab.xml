@@ -156,6 +156,7 @@
     <!-- Partea din centru a imaginii -->
 
     <LinearLayout
+        android:visibility="invisible"
         android:id="@+id/bid_layout"
         android:layout_width="match_parent"
         android:layout_height="0dp"

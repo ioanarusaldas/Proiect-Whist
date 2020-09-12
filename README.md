@@ -10,6 +10,7 @@ aborda situatia?
 se creeze de 2 ori - e nevoie sa apasam pe butonul de back de 2 ori ca sa
 ne intoarcem in waiting room)
 - Cum transmitem informatii de la un tab la altul?
+
 (GameTab -> ScoreTab)
 
 
@@ -84,3 +85,17 @@ face un Log la cartile primite
 
 10.09 - Sergiu + Rusalda
 - fixat bug-uri la conectarea jucatorilor
+
+
+11.09 - Sergiu
+- adaugat flow-ul de bid al playerilor 
+(ultimele modificari trebuie testate pe mai multe device-uri)!
+
+
+=== buguri:
+
+- dupa ultimele modificari: probleme la start (mereu jocul trebuie pornit cu 
+Started = False hardcodat in baza de date)
+
+- probleme - nu apar cartile cateodata
+- crash-uri
