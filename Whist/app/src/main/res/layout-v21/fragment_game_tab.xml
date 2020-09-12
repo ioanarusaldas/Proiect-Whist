@@ -18,7 +18,7 @@
         android:columnCount="5">
 
         <LinearLayout
-            android:id="@+id/layout1"
+            android:id="@+id/opponent_layout1"
             android:layout_width="80dp"
             android:layout_height="match_parent"
             android:layout_column="0"
@@ -45,7 +45,7 @@
         </LinearLayout>
 
         <LinearLayout
-            android:id="@+id/layout2"
+            android:id="@+id/opponent_layout2"
             android:layout_width="80dp"
             android:layout_height="match_parent"
             android:layout_column="1"
@@ -71,7 +71,7 @@
         </LinearLayout>
 
         <LinearLayout
-            android:id="@+id/layout3"
+            android:id="@+id/opponent_layout3"
             android:layout_width="80dp"
             android:layout_height="match_parent"
             android:layout_column="2"
@@ -98,7 +98,7 @@
 
 
         <LinearLayout
-            android:id="@+id/layout4"
+            android:id="@+id/opponent_layout4"
             android:layout_width="80dp"
             android:layout_height="match_parent"
             android:layout_column="3"
@@ -125,7 +125,7 @@
 
 
         <LinearLayout
-            android:id="@+id/layout5"
+            android:id="@+id/opponent_layout5"
             android:layout_width="80dp"
             android:layout_height="match_parent"
             android:layout_column="4"
@@ -156,6 +156,7 @@
     <!-- Partea din centru a imaginii -->
 
     <LinearLayout
+        android:id="@+id/bid_layout"
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:layout_gravity="center"
@@ -164,7 +165,6 @@
         android:orientation="vertical">
 
         <TextView
-            android:id="@+id/middle_layout"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="What is your bid?"
@@ -173,6 +173,7 @@
 
 
         <GridLayout
+            android:id="@+id/buttons_grid"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_gravity="center_horizontal"

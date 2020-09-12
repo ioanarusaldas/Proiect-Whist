@@ -63,12 +63,4 @@ public class GameActivity extends AppCompatActivity {
                 .child("Game").child("Status").child("Started");
         statusReference.setValue("False");
     }
-/* TODO:
-            - adaugare de elemente pentru a intreba utilizatorul cate maini crede ca va lua
-            - setare listeneri corespunzatori astfel incat dupa ce un utilizator a spus cate maini va lua,
-            urmatorul sa fie intrebat
-            -De facut tabel
-            -De facut tabbarul sa dispara/apara la swipe
-
-        */
 }
