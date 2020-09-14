@@ -44,12 +44,12 @@ public class WaitingRoomActivity extends AppCompatActivity {
 
     private boolean disconnected = false;
 
+
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_waiting_room);
-
-        // ======
 
         mPlayerNameList = findViewById(R.id.player_name_list);
 
@@ -59,10 +59,60 @@ public class WaitingRoomActivity extends AppCompatActivity {
         // DataBind ListView with items from ArrayAdapter
         mPlayerNameList.setAdapter(arrayAdapter);
 
-        // ======
-
+        // adaugam listener pe intrarea "Players" din baza de date
         mPlayerReference = FirebaseDatabase.getInstance().getReference().child("Players");
-        mPlayerReference.addChildEventListener(new ChildEventListener() {
+        mPlayerReference.addChildEventListener(playersListener(arrayAdapter));
+
+
+        // setare listener pe mInput
+        mInput = findViewById(R.id.player_name);
+        mInput.setOnEditorActionListener(inputListener());
+
+        mStartButton = findViewById(R.id.start_game_button);
+    }
+
+    /*
+        Daca inchidem activitatea, eliminam din baza de date jucatorul si notificam ceilalti jucatori
+        sa isi actualizeze UI-ul prin eliminarea noastra din lista
+     */
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+
+        // flag care indica ca modificarea bazei de date se realizeaza din cauza unei deconectari
+        disconnected = true;
+        playerList.remove(playerName);
+
+        HashMap<String, Object> map = new HashMap<>();
+
+        for (int i = 0; i < playerList.size(); i++) {
+            map.put("Player" + (i + 1), playerList.get(i));
+        }
+        mPlayerReference.setValue(map);
+    }
+
+    // metoda care porneste activitatea GameActivity si notifica si pe ceilalti jucatori sa o deschida
+    public void startGame(View view) {
+
+        // actualizeaza intrarea Started cu true pentru a informa ceilalti jucatori ca jocul a inceput
+        HashMap<String, Object> map = new HashMap<>();
+        map.put("Started", "True");
+        mStatusReference.setValue(map);
+
+        // incepere joc
+        Intent intent = new Intent(this, GameActivity.class);
+        intent.putExtra("myIndex", playerIndex);
+        intent.putStringArrayListExtra("players", playerList);
+        startActivity(intent);
+    }
+
+
+
+    //////////////////////// Metode care seteaza listeneri //////////////////////////////
+
+    // listener pentru intrarea Players din baza de date
+    private ChildEventListener playersListener(final ArrayAdapter<String> arrayAdapter) {
+        return new ChildEventListener() {
             @Override
             public void onChildAdded(@NonNull DataSnapshot snapshot, @Nullable String previousChildName) {
 
@@ -139,11 +189,45 @@ public class WaitingRoomActivity extends AppCompatActivity {
             @Override
             public void onCancelled(@NonNull DatabaseError error) {
             }
-        });
+        };
+    }
 
-        // setare listener pe mInput
-        mInput = findViewById(R.id.player_name);
-        mInput.setOnEditorActionListener(new TextView.OnEditorActionListener() {
+    // Listener pentru intrarea Status din baza de date
+    private ChildEventListener statusListener() {
+        return new ChildEventListener() {
+            @Override
+            public void onChildAdded(@NonNull DataSnapshot snapshot, @Nullable String previousChildName) {}
+
+            @Override
+            public void onChildChanged(@NonNull DataSnapshot snapshot, @Nullable String previousChildName) {
+                String key = snapshot.getKey();
+                String gameState = snapshot.getValue(String.class);
+                // Daca altcineva a apasat butonul de start, acest lucru este semnalat de modificarea intrarii
+                // "Status" - se creaza un intent si se porneste GameActivity
+                if(key.equals("Started") && gameState.equals("True")) {
+
+                    Intent intent = new Intent(WaitingRoomActivity.this, GameActivity.class);
+                    intent.putExtra("myIndex", playerIndex);
+                    intent.putStringArrayListExtra("players", playerList);
+                    startActivity(intent);
+                }
+            }
+
+            @Override
+            public void onChildRemoved(@NonNull DataSnapshot snapshot) {}
+
+            @Override
+            public void onChildMoved(@NonNull DataSnapshot snapshot, @Nullable String previousChildName) {}
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {}
+        };
+    }
+
+    // listener pentru Input de la utilizator (pentru introducerea numelui)
+
+    private TextView.OnEditorActionListener inputListener() {
+        return new TextView.OnEditorActionListener() {
             @Override
             public boolean onEditorAction(TextView textView, int i, KeyEvent keyEvent) {
 
@@ -160,7 +244,7 @@ public class WaitingRoomActivity extends AppCompatActivity {
 
                 //  =====
 
-               if (playerList.size() < 6) {
+                if (playerList.size() < 6) {
                     // determinare pozitie pentru player in lista
                     if (playerName == null) {
                         playerIndex = playerList.size() + 1;
@@ -178,34 +262,7 @@ public class WaitingRoomActivity extends AppCompatActivity {
 
                     // setare listener pentru intrarea "Status"
                     mStatusReference = FirebaseDatabase.getInstance().getReference().child("Game").child("Status");
-                    mStatusReference.addChildEventListener(new ChildEventListener() {
-                        @Override
-                        public void onChildAdded(@NonNull DataSnapshot snapshot, @Nullable String previousChildName) {}
-
-                        @Override
-                        public void onChildChanged(@NonNull DataSnapshot snapshot, @Nullable String previousChildName) {
-                            String key = snapshot.getKey();
-                            String gameState = snapshot.getValue(String.class);
-                            // Daca altcineva a apasat butonul de start, acest lucru este semnalat de modificarea intrarii
-                            // "Status" - se creaza un intent si se porneste GameActivity
-                            if(key.equals("Started") && gameState.equals("True")) {
-
-                                Intent intent = new Intent(WaitingRoomActivity.this, GameActivity.class);
-                                intent.putExtra("myIndex", playerIndex);
-                                intent.putStringArrayListExtra("players", playerList);
-                                startActivity(intent);
-                            }
-                        }
-
-                        @Override
-                        public void onChildRemoved(@NonNull DataSnapshot snapshot) {}
-
-                        @Override
-                        public void onChildMoved(@NonNull DataSnapshot snapshot, @Nullable String previousChildName) {}
-
-                        @Override
-                        public void onCancelled(@NonNull DatabaseError error) {}
-                    });
+                    mStatusReference.addChildEventListener(statusListener());
                 } else {
                     // Restrictionam numarul maxim de jucatori la 6
                     Toast.makeText(WaitingRoomActivity.this, "Maximum number of players (6) reached!", Toast.LENGTH_SHORT).show();
@@ -213,43 +270,6 @@ public class WaitingRoomActivity extends AppCompatActivity {
 
                 return true;
             }
-        });
-
-        mStartButton = findViewById(R.id.start_game_button);
-    }
-
-    /*
-        Daca inchidem activitatea, eliminam din baza de date jucatorul si notificam ceilalti jucatori
-        sa isi actualizeze UI-ul prin eliminarea noastra din lista
-     */
-    @Override
-    protected void onDestroy() {
-        super.onDestroy();
-
-        // flag care indica ca modificarea bazei de date se realizeaza din cauza unei deconectari
-        disconnected = true;
-        playerList.remove(playerName);
-
-        HashMap<String, Object> map = new HashMap<>();
-
-        for (int i = 0; i < playerList.size(); i++) {
-            map.put("Player" + (i + 1), playerList.get(i));
-        }
-        mPlayerReference.setValue(map);
-    }
-
-    // metoda care porneste activitatea GameActivity si notifica si pe ceilalti jucatori sa o deschida
-    public void startGame(View view) {
-
-        // actualizeaza intrarea Started cu true pentru a informa ceilalti jucatori ca jocul a inceput
-        HashMap<String, Object> map = new HashMap<>();
-        map.put("Started", "True");
-        mStatusReference.setValue(map);
-
-        // incepere joc
-        Intent intent = new Intent(this, GameActivity.class);
-        intent.putExtra("myIndex", playerIndex);
-        intent.putStringArrayListExtra("players", playerList);
-        startActivity(intent);
+        };
     }
 }

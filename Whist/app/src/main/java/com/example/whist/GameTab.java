@@ -1,12 +1,6 @@
 package com.example.whist;
 
-import android.content.Context;
 import android.os.Bundle;
-
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
-import androidx.fragment.app.Fragment;
-
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -17,6 +11,10 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.fragment.app.Fragment;
+
 import com.google.firebase.database.ChildEventListener;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
@@ -26,9 +24,7 @@ import com.google.firebase.database.GenericTypeIndicator;
 
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.LinkedList;
 import java.util.Map;
-import java.util.Queue;
 
 public class GameTab extends Fragment {
 
@@ -42,14 +38,9 @@ public class GameTab extends Fragment {
     // lista bid-urilor
     private final ArrayList<Integer> bids = new ArrayList<>();
 
-    // boolean care indica daca jucatorul a dat bid
-    private boolean bid = false;
-
     private View rootView;
 
-    public GameTab() {
-        // Required empty public constructor
-    }
+    public GameTab() {}
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -79,7 +70,7 @@ public class GameTab extends Fragment {
         hidePlayerAvatars(rootView);
 
         // setare listeneri pe butoanele de bid
-        setBidListeners();
+        setButtonListeners();
 
         // metoda prin care se ruleaza jocul
         runGame(rootView);
@@ -87,8 +78,58 @@ public class GameTab extends Fragment {
         return rootView;
     }
 
-    private void setBidListeners() {
-        // setam listeneri pe fiecare buton
+    private void runGame(View rootView) {
+        // (Momentan) se realizeaza un joc de 8
+        turn(0, 8, rootView);
+    }
+
+
+    public void turn(final int currentPlayerIndex, int gameType, final View rootView) {
+
+        // Cod executat doar de jucatorul care este la rand sa faca bid
+        if (currentPlayerIndex + 1 == myIndex) {
+            // Amestecare carti + trimitere la server
+            ArrayList<Integer> shuffledCards = CardShuffler.shuffleCards(playerCount);
+            Map<String, Object> map = new HashMap<>();
+
+            // Pun pentru fiecare player intr-un map un sublist al listei de carti amestecate
+            // (8 carti pentru Player1, urmatoarele 8 carti pentru Player2, etc)
+            for (int i = 0; i < playerCount; i++) {
+                map.put("Cards", shuffledCards.subList(gameType * i, gameType * (i + 1)));
+
+                // Trimitere la server playeri cu cartile lor amestecate
+                DatabaseReference currPlayerReference = turnReference.child("Player" + (i + 1));
+                currPlayerReference.updateChildren(map);
+
+                // Trimitere la server Bids
+                if(i != currentPlayerIndex) {
+                    bidReference.child("Player" + (i + 1)).setValue("Pending");
+                }
+
+            }
+
+            // setam pe intrarea jucatorului curent faptul ca el este cel care trebuie sa aleaga
+            bidReference.child("Player" + (currentPlayerIndex + 1)).setValue("Current");
+        }
+
+        // Setare listener pe intrarea Player <indicele meu>
+        DatabaseReference myPlayerReference = turnReference.child("Player" + myIndex);
+        myPlayerReference.addChildEventListener(myPlayerListener());
+
+
+        /// Inregistrarea bid-urilor jucatorilor
+        // setare listener pe bidReference
+        bidReference.addChildEventListener(bidListener());
+
+    }
+
+    ////////////////////////////////////////////////////////////////////////////////////////////
+                                        // setup
+
+
+    // metoda care seteaza cate un listener pe fiecare buton de bid
+    private void setButtonListeners() {
+
         GridLayout buttonsGrid = (GridLayout) rootView.findViewById(R.id.buttons_grid);
         final LinearLayout bidLayout = (LinearLayout) rootView.findViewById(R.id.bid_layout);
         int buttonsCount = buttonsGrid.getChildCount();
@@ -115,7 +156,7 @@ public class GameTab extends Fragment {
                     if(myIndex < playerCount) {
                         bidReference.child("Player" + (myIndex + 1)).setValue("Current");
                     } else {
-                        bid = true;
+                        // aici: se executa codul de dupa partea de bid
                         turnReference.child("Next").setValue("Player1");
                         Log.d("bids are:", "Bids are:" + bids.toString());
                     }
@@ -170,45 +211,11 @@ public class GameTab extends Fragment {
         }
     }
 
-    private void runGame(View rootView) {
+    ///////////////////////////////////////////////////////////////////////////////////////////////
 
-        // (Momentan) se realizeaza un joc de 8
-        turn(0, 8, rootView);
-
-    }
-
-
-    public void turn(final int currentPlayerIndex, int gameType, final View rootView) {
-
-        // Afisare carti
-        if (currentPlayerIndex + 1 == myIndex) {
-            // Amestecare carti + trimitere la server
-            ArrayList<Integer> shuffledCards = CardShuffler.shuffleCards(playerCount);
-            Map<String, Object> map = new HashMap<>();
-
-            // Pun pentru fiecare player intr-un map un sublist al listei de carti amestecate
-            // (8 carti pentru Player1, urmatoarele 8 carti pentru Player2, etc)
-            for (int i = 0; i < players.size(); i++) {
-                map.put("Cards", shuffledCards.subList(gameType * i, gameType * (i + 1)));
-
-                // Trimitere la server playeri cu cartile lor amestecate
-                DatabaseReference currPlayerReference = turnReference.child("Player" + (i + 1));
-                currPlayerReference.updateChildren(map);
-
-                // Trimitere la server Bids
-                if(i != currentPlayerIndex) {
-                    bidReference.child("Player" + (i + 1)).setValue("Pending");
-                }
-
-            }
-
-            // setam pe intrarea jucatorului curent faptul ca el este cel care trebuie sa aleaga
-            bidReference.child("Player" + (currentPlayerIndex + 1)).setValue("Current");
-        }
-
-        // Setare listener pe intrarea Player <indicele meu>
-        DatabaseReference myPlayerReference = turnReference.child("Player" + myIndex);
-        myPlayerReference.addChildEventListener(new ChildEventListener() {
+    // listener pe intrarea "Player"
+    private ChildEventListener myPlayerListener() {
+        return new ChildEventListener() {
 
             @Override
             public void onChildAdded(@NonNull DataSnapshot snapshot, @Nullable String previousChildName) {
@@ -217,8 +224,11 @@ public class GameTab extends Fragment {
                 };
                 ArrayList<Integer> myCards = snapshot.getValue(t);
 
+
                 //  - asteptam pana cand fragmentul este atasat de activitate -- Exista o metoda mai eleganta?
-                while (getActivity() == null) ;
+                while (getActivity() == null) {
+                    Log.d("whileDebug", "Waiting " + System.currentTimeMillis());
+                }
 
                 // Introducere carti pe slot-urile libere din fragment_game_tab.xml
                 for (int i = 0; i < myCards.size(); i++) {
@@ -247,15 +257,13 @@ public class GameTab extends Fragment {
 
             @Override
             public void onCancelled(@NonNull DatabaseError error) {}
-        });
+        };
+    }
 
 
-        ////////////////////////////////////////////////////////////////////////////////////////////
-
-        /// Inregistrarea bid-urilor jucatorilor
-
-        // setare listener pe bidReference
-        bidReference.addChildEventListener(new ChildEventListener() {
+    // listener pe intrarea de Bid
+    private ChildEventListener bidListener() {
+        return new ChildEventListener() {
             @Override
             public void onChildAdded(@NonNull DataSnapshot snapshot, @Nullable String previousChildName) {
                 String key = snapshot.getKey();
@@ -305,11 +313,6 @@ public class GameTab extends Fragment {
 
             @Override
             public void onCancelled(@NonNull DatabaseError error) {}
-        });
-
-        ////////////////////////////////////////////////////////////////////////////////////////////
-        // TODO: De testat partea de turn
-        // TODO: partea de dat carti
-
+        };
     }
 }

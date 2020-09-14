@@ -34,13 +34,13 @@ conectati
 
 In clasa WaitingRoomActivity:
 
-1. - In onCreate, se extrage valoarea pentru intrarea "Players", se extrag numele
+- In onCreate, se extrage valoarea pentru intrarea "Players", se extrag numele
     jucatorilor, se adauga in playerList si se actualizeaza arrayAdapter, pentru a 
     se afisa jucatorii deja conectati
-2. - In onCreate se seteaza listener pe intrarea cu cheia "Players", astfel incat
+- In onCreate se seteaza listener pe intrarea cu cheia "Players", astfel incat
 la orice modificare a valorii intrarii sa se modifice si playerList 
 (astfel lista de jucatori afisata pe ecran se actualizeaza in timp real).
-3. - Am adaugat un TextView in care se specifica cati jucatori s-au conectat.
+- Am adaugat un TextView in care se specifica cati jucatori s-au conectat.
 
 
 
@@ -91,11 +91,16 @@ face un Log la cartile primite
 - adaugat flow-ul de bid al playerilor 
 (ultimele modificari trebuie testate pe mai multe device-uri)!
 
+11.09 - Rusalda + Sergiu
+- Adaugat avatare pentru jucatori
+- ajustare layout in functie de numarul de jucatori
+- implementare layout personalizat dinamic pentru fiecare jucator (fiecare jucator
+isi vede adversarii in partea de sus)
 
-=== buguri:
+12.09 - Sergiu + Irina
+- testare
 
-- dupa ultimele modificari: probleme la start (mereu jocul trebuie pornit cu 
-Started = False hardcodat in baza de date)
+14.09 - Sergiu
+- Identificare probleme blocare UI Thread (getActivity() intoarce null in fragment)
+- Modularizare WaitingRoomActivity si GameTab
 
-- probleme - nu apar cartile cateodata
-- crash-uri
