@@ -1,17 +1,19 @@
 # Proiect-Whist
 
-Neclaritati:
-
-- In fragmentul GameTab am pus un while ca sa asteptam pana cand metoda
-getActivity() nu mai intoarcee null. Exista vreo metoda alternativa de a
-aborda situatia?
-- De ce callbackurile din waiting room activity se apeleaza de 2 ori?
-(presupunem ca asta este motivul pentru care activitatea jocului pare sa
-se creeze de 2 ori - e nevoie sa apasam pe butonul de back de 2 ori ca sa
-ne intoarcem in waiting room)
 - Cum transmitem informatii de la un tab la altul?
 
 (GameTab -> ScoreTab)
+
+
+
+===============================================================================
+
+TODO:
+
+- Design frumos la MainActivity + WaitingRoomActivity (sa facem cumva sa nu
+mai iasa lista cu jucatori din ecran)
+- Design frumos la ScoreTab + Tabelul cu scorul
+- Continuam functia turn cu dat-ul cartilor
 
 
 ===============================================================================
@@ -103,4 +105,12 @@ isi vede adversarii in partea de sus)
 14.09 - Sergiu
 - Identificare probleme blocare UI Thread (getActivity() intoarce null in fragment)
 - Modularizare WaitingRoomActivity si GameTab
+
+15.09 - Irina + Miruna
+- Modificare design meniu principal + Waiting room activity
+
+15.09 - Rusalda + Sergiu
+- Adaugare textview-uri cu bid-urile si setarea lor dupa ce toata lumea a licitat
+
+
 
