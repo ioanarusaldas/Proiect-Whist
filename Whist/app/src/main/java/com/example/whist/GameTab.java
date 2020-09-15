@@ -1,5 +1,6 @@
 package com.example.whist;
 
+import android.content.Context;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -40,7 +41,15 @@ public class GameTab extends Fragment {
 
     private View rootView;
 
+    private Context mContext;
+
     public GameTab() {}
+
+    @Override
+    public void onAttach(@NonNull Context context) {
+        super.onAttach(context);
+        mContext = context;
+    }
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -224,20 +233,14 @@ public class GameTab extends Fragment {
                 };
                 ArrayList<Integer> myCards = snapshot.getValue(t);
 
-
-                //  - asteptam pana cand fragmentul este atasat de activitate -- Exista o metoda mai eleganta?
-                while (getActivity() == null) {
-                    Log.d("whileDebug", "Waiting " + System.currentTimeMillis());
-                }
-
                 // Introducere carti pe slot-urile libere din fragment_game_tab.xml
                 for (int i = 0; i < myCards.size(); i++) {
                     // extragere id al slot-ului
 
-                    int resId = getActivity().getResources().getIdentifier(
+                    int resId = mContext.getResources().getIdentifier(
                             "card_slot_" + (i + 1),
                             "id",
-                            getActivity().getPackageName()
+                            mContext.getPackageName()
                     );
 
                     ImageView card = rootView.findViewById(resId);
