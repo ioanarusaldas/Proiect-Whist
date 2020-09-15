@@ -10,7 +10,7 @@ import androidx.fragment.app.FragmentPagerAdapter;
 import java.util.ArrayList;
 
 public class PageAdapter extends FragmentPagerAdapter {
-    private  int notabs;
+    private int notabs;
 
     private ArrayList<String> players;
     private Integer myIndex;
@@ -21,22 +21,20 @@ public class PageAdapter extends FragmentPagerAdapter {
         this.players = players;
         this.myIndex = myIndex;
     }
+
     @NonNull
     @Override
     public Fragment getItem(int position) {
         switch (position) {
             case 0:
-                GameTab tab =  new GameTab();
+                GameTab tab = new GameTab();
                 Bundle b = new Bundle();
                 b.putStringArrayList("players", players);
                 b.putInt("myIndex", myIndex);
                 tab.setArguments(b);
                 return tab;
-
-
-
             case 1:
-                return  new ScoreTab();
+                return new ScoreTab();
 
             default:
                 return null;
@@ -51,7 +49,7 @@ public class PageAdapter extends FragmentPagerAdapter {
 
     @Override
     public int getItemPosition(@NonNull Object object) {
-        return  notabs;
+        return notabs;
     }
 
 }

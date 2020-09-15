@@ -20,7 +20,6 @@ public class GameActivity extends AppCompatActivity {
     // Date despre ceilalti jucatori
     private ArrayList<String> players;
 
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);

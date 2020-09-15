@@ -14,7 +14,7 @@
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:layout_gravity="center_horizontal"
-        android:layout_weight="0.25"
+        android:layout_weight="0.35"
         android:columnCount="5">
 
         <LinearLayout
@@ -38,7 +38,14 @@
                 android:layout_width="match_parent"
                 android:layout_height="0dp"
                 android:layout_weight="0.25"
-                android:text="left"
+                android:textAlignment="center"
+                android:textColor="@android:color/white" />
+            <TextView
+                android:id="@+id/player1_bid"
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                android:layout_weight="0.25"
+                android:visibility="invisible"
                 android:textAlignment="center"
                 android:textColor="@android:color/white" />
 
@@ -65,7 +72,15 @@
                 android:layout_width="match_parent"
                 android:layout_height="0dp"
                 android:layout_weight="0.25"
-                android:text="center"
+                android:textAlignment="center"
+                android:textColor="@android:color/white" />
+
+            <TextView
+                android:id="@+id/player2_bid"
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                android:layout_weight="0.25"
+                android:visibility="invisible"
                 android:textAlignment="center"
                 android:textColor="@android:color/white" />
         </LinearLayout>
@@ -91,7 +106,15 @@
                 android:layout_width="match_parent"
                 android:layout_height="0dp"
                 android:layout_weight="0.25"
-                android:text="right"
+                android:textAlignment="center"
+                android:textColor="@android:color/white" />
+
+            <TextView
+                android:id="@+id/player3_bid"
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                android:layout_weight="0.25"
+                android:visibility="invisible"
                 android:textAlignment="center"
                 android:textColor="@android:color/white" />
         </LinearLayout>
@@ -118,7 +141,15 @@
                 android:layout_width="match_parent"
                 android:layout_height="0dp"
                 android:layout_weight="0.25"
-                android:text="left"
+                android:textAlignment="center"
+                android:textColor="@android:color/white" />
+
+            <TextView
+                android:id="@+id/player4_bid"
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                android:layout_weight="0.25"
+                android:visibility="invisible"
                 android:textAlignment="center"
                 android:textColor="@android:color/white" />
         </LinearLayout>
@@ -145,7 +176,15 @@
                 android:layout_width="match_parent"
                 android:layout_height="0dp"
                 android:layout_weight="0.25"
-                android:text="left"
+                android:textAlignment="center"
+                android:textColor="@android:color/white" />
+
+            <TextView
+                android:id="@+id/player5_bid"
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                android:layout_weight="0.25"
+                android:visibility="invisible"
                 android:textAlignment="center"
                 android:textColor="@android:color/white" />
         </LinearLayout>
@@ -161,7 +200,7 @@
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:layout_gravity="center"
-        android:layout_weight="0.5"
+        android:layout_weight="0.4"
         android:gravity="bottom"
         android:orientation="vertical">
 
@@ -246,6 +285,21 @@
 
         </GridLayout>
 
+    </LinearLayout>
+
+
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="0.07">
+        <TextView
+            android:id="@+id/my_bid_text_view"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:textAlignment="center"
+            android:textColor="@android:color/white"
+            android:visibility="invisible"/>
     </LinearLayout>
 
     <!-- Aici sunt plasate cartile, layout-ul ocupa 25% din inaltimea ecranului-->

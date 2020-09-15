@@ -40,7 +40,6 @@ public class GameTab extends Fragment {
     private final ArrayList<Integer> bids = new ArrayList<>();
 
     private View rootView;
-
     private Context mContext;
 
     public GameTab() {}
@@ -81,6 +80,8 @@ public class GameTab extends Fragment {
         // setare listeneri pe butoanele de bid
         setButtonListeners();
 
+        setBidFinishedListener();
+
         // metoda prin care se ruleaza jocul
         runGame(rootView);
 
@@ -114,7 +115,6 @@ public class GameTab extends Fragment {
                 if(i != currentPlayerIndex) {
                     bidReference.child("Player" + (i + 1)).setValue("Pending");
                 }
-
             }
 
             // setam pe intrarea jucatorului curent faptul ca el este cel care trebuie sa aleaga
@@ -152,7 +152,6 @@ public class GameTab extends Fragment {
                     // adaugam valoarea la lista bids
                     Button b = (Button) view;
                     Integer value = Integer.parseInt(b.getText().toString());
-                    bids.add(value);
 
                     // ascundem bid_layout
                     bidLayout.setVisibility(View.INVISIBLE);
@@ -164,10 +163,10 @@ public class GameTab extends Fragment {
                     // daca toata lumea a pariat, setam bid = true pentru a trece la partea de dat carti
                     if(myIndex < playerCount) {
                         bidReference.child("Player" + (myIndex + 1)).setValue("Current");
-                    } else {
+
+                    } else if(myIndex == playerCount){
                         // aici: se executa codul de dupa partea de bid
-                        turnReference.child("Next").setValue("Player1");
-                        Log.d("bids are:", "Bids are:" + bids.toString());
+                        turnReference.child("BidFinished").child("IsFinished").setValue("True");
                     }
                 }
             });
@@ -317,5 +316,57 @@ public class GameTab extends Fragment {
             @Override
             public void onCancelled(@NonNull DatabaseError error) {}
         };
+    }
+
+    private void setBidFinishedListener() {
+        turnReference.child("BidFinished").child("IsFinished").setValue("False");
+
+        turnReference.child("BidFinished").addChildEventListener(new ChildEventListener() {
+            @Override
+            public void onChildAdded(@NonNull DataSnapshot snapshot, @Nullable String previousChildName) {}
+
+            @Override
+            public void onChildChanged(@NonNull DataSnapshot snapshot, @Nullable String previousChildName) {
+                String value = snapshot.getValue(String.class);
+
+                if(value.equals("True")) {
+                    setBidTextViews();
+                }
+            }
+
+            @Override
+            public void onChildRemoved(@NonNull DataSnapshot snapshot) {}
+
+            @Override
+            public void onChildMoved(@NonNull DataSnapshot snapshot, @Nullable String previousChildName) {}
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {}
+        });
+    }
+
+    private void setBidTextViews() {
+
+        ArrayList<TextView> bidTextViews = new ArrayList<>(5);
+        bidTextViews.add((TextView) rootView.findViewById(R.id.player1_bid));
+        bidTextViews.add((TextView) rootView.findViewById(R.id.player2_bid));
+        bidTextViews.add((TextView) rootView.findViewById(R.id.player3_bid));
+        bidTextViews.add((TextView) rootView.findViewById(R.id.player4_bid));
+        bidTextViews.add((TextView) rootView.findViewById(R.id.player5_bid));
+
+        TextView myBidTextView = rootView.findViewById(R.id.my_bid_text_view);
+        myBidTextView.setVisibility(View.VISIBLE);
+        myBidTextView.setText("Bid: " + bids.get(myIndex - 1));
+
+        Log.d("bids are", "bids are: " + bids.toString());
+
+        int index = 0;
+
+        for (int i = 0; i < players.size(); i++) {
+            if ((i + 1) != myIndex) {
+                bidTextViews.get(index).setVisibility(View.VISIBLE);
+                bidTextViews.get(index++).setText("Bid: " + bids.get(i));
+            }
+        }
     }
 }
