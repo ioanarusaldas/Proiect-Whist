@@ -99,7 +99,7 @@ public class GameTab extends Fragment {
         // Cod executat doar de jucatorul care este la rand sa faca bid
         if (currentPlayerIndex + 1 == myIndex) {
             // Amestecare carti + trimitere la server
-            ArrayList<Integer> shuffledCards = CardShuffler.shuffleCards(playerCount);
+            ArrayList<String> shuffledCards = CardShuffler.shuffleCards(playerCount);
             Map<String, Object> map = new HashMap<>();
 
             // Pun pentru fiecare player intr-un map un sublist al listei de carti amestecate
@@ -110,6 +110,9 @@ public class GameTab extends Fragment {
                 // Trimitere la server playeri cu cartile lor amestecate
                 DatabaseReference currPlayerReference = turnReference.child("Player" + (i + 1));
                 currPlayerReference.updateChildren(map);
+
+//                Log.d("cards are:", shuffledCards.subList(gameType * i, gameType * (i + 1)).toString() );
+//                Log.d("ace is", new Integer(R.drawable.clubs_a).toString());
 
                 // Trimitere la server Bids
                 if(i != currentPlayerIndex) {
@@ -154,7 +157,7 @@ public class GameTab extends Fragment {
                     Integer value = Integer.parseInt(b.getText().toString());
 
                     // ascundem bid_layout
-                    bidLayout.setVisibility(View.INVISIBLE);
+                    bidLayout.setVisibility(View.GONE);
 
                     // setam bid-ul in baza de date
                     bidReference.child("Player" + myIndex).setValue(value);
@@ -228,13 +231,14 @@ public class GameTab extends Fragment {
             @Override
             public void onChildAdded(@NonNull DataSnapshot snapshot, @Nullable String previousChildName) {
                 // Extragere carti de la intrarea Player cu indicele jucatorului curent
-                GenericTypeIndicator<ArrayList<Integer>> t = new GenericTypeIndicator<ArrayList<Integer>>() {
+                GenericTypeIndicator<ArrayList<String>> t = new GenericTypeIndicator<ArrayList<String>>() {
                 };
-                ArrayList<Integer> myCards = snapshot.getValue(t);
+                ArrayList<String> myCards = snapshot.getValue(t);
 
                 // Introducere carti pe slot-urile libere din fragment_game_tab.xml
                 for (int i = 0; i < myCards.size(); i++) {
                     // extragere id al slot-ului
+
 
                     int resId = mContext.getResources().getIdentifier(
                             "card_slot_" + (i + 1),
@@ -242,9 +246,15 @@ public class GameTab extends Fragment {
                             mContext.getPackageName()
                     );
 
+                    int drawableId = mContext.getResources().getIdentifier(
+                            myCards.get(i),
+                            "drawable",
+                            mContext.getPackageName()
+                    );
+
                     ImageView card = rootView.findViewById(resId);
                     // setare resursa pe slot
-                    card.setImageResource(myCards.get(i));
+                    card.setImageResource(drawableId);
                 }
             }
 

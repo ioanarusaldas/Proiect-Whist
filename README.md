@@ -114,3 +114,26 @@ isi vede adversarii in partea de sus)
 
 
 
+===============================================================================
+
+
+
+BidFinished = True -> 
+- afisam bid-urile
+- introducem intrarea Hands avand - intrarea Hand1, Hand2 ... Hand8
+
+Hand1 va avea:
+StartingPlayer - cu numele/indicele jucatorului care da prima carte
+(la acest jucator se vor seta metode de onClick pe carti care vor muta cartea in
+partea de centru a ecranului si va trimite la server valoarea resursei cartii date),
+modificand valoarea "Pending" in valoare "Current" pentru urmatorul jucator
+
+Player1, Player2 ... PlayerN - care vor avea initial Pending, jucatorul curent va avea
+Current, iar cand valoarea din Current se va modifica intr-o valoare numerica
+reprezentand valoarea resursei imaginii cartii pe care a dat-o, fiecare player va seta
+cartea corespunzatoare in dreptul jucatorului care a dat-o.
+
+
+
+
+

@@ -37,10 +37,10 @@
 
             <ImageView
                 android:id="@+id/player1_avatar"
-                android:layout_width="match_parent"
+                android:layout_width="wrap_content"
                 android:layout_height="0dp"
                 android:layout_weight="0.75"
-                android:src="@drawable/koala" />
+                android:src="@drawable/monkey" />
 
             <TextView
                 android:id="@+id/player1_bid"
@@ -68,29 +68,37 @@
             android:layout_gravity="center"
             android:orientation="vertical">
 
+            <TextView
+                android:id="@+id/player2_name"
+                android:layout_width="match_parent"
+                android:layout_height= "wrap_content"
+                android:textAlignment="center"
+                android:layout_marginTop="4dp"
+                android:textSize="16sp"
+                android:textColor="@android:color/white" />
+
             <ImageView
                 android:id="@+id/player2_avatar"
                 android:layout_width="match_parent"
                 android:layout_height="0dp"
                 android:layout_weight="0.75"
-                android:src="@drawable/monkey" />
-
-            <TextView
-                android:id="@+id/player2_name"
-                android:layout_width="match_parent"
-                android:layout_height="0dp"
-                android:layout_weight="0.25"
-                android:textAlignment="center"
-                android:textColor="@android:color/white" />
+                android:src="@drawable/koala" />
 
             <TextView
                 android:id="@+id/player2_bid"
                 android:layout_width="match_parent"
-                android:layout_height="0dp"
-                android:layout_weight="0.25"
+                android:layout_height="wrap_content"
                 android:visibility="invisible"
                 android:textAlignment="center"
-                android:textColor="@android:color/white" />
+                android:layout_marginBottom="4dp"
+                android:textColor="@android:color/white"/>
+            <ImageView
+                android:id="@+id/player2_card"
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                android:layout_weight="0.75"
+                android:src="@drawable/clubs_2"/>
+
         </LinearLayout>
 
         <LinearLayout
@@ -102,6 +110,15 @@
             android:layout_gravity="center"
             android:orientation="vertical">
 
+            <TextView
+                android:id="@+id/player3_name"
+                android:layout_width="match_parent"
+                android:layout_height= "wrap_content"
+                android:textAlignment="center"
+                android:layout_marginTop="4dp"
+                android:textSize="16sp"
+                android:textColor="@android:color/white" />
+
             <ImageView
                 android:id="@+id/player3_avatar"
                 android:layout_width="match_parent"
@@ -110,21 +127,20 @@
                 android:src="@drawable/lion" />
 
             <TextView
-                android:id="@+id/player3_name"
-                android:layout_width="match_parent"
-                android:layout_height="0dp"
-                android:layout_weight="0.25"
-                android:textAlignment="center"
-                android:textColor="@android:color/white" />
-
-            <TextView
                 android:id="@+id/player3_bid"
                 android:layout_width="match_parent"
-                android:layout_height="0dp"
-                android:layout_weight="0.25"
+                android:layout_height="wrap_content"
                 android:visibility="invisible"
                 android:textAlignment="center"
-                android:textColor="@android:color/white" />
+                android:layout_marginBottom="4dp"
+                android:textColor="@android:color/white"/>
+            <ImageView
+                android:id="@+id/player3_card"
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                android:layout_weight="0.75"
+                android:src="@drawable/clubs_2"/>
+
         </LinearLayout>
 
 
@@ -137,29 +153,37 @@
             android:layout_gravity="center"
             android:orientation="vertical">
 
+            <TextView
+                android:id="@+id/player4_name"
+                android:layout_width="match_parent"
+                android:layout_height= "wrap_content"
+                android:textAlignment="center"
+                android:layout_marginTop="4dp"
+                android:textSize="16sp"
+                android:textColor="@android:color/white" />
+
             <ImageView
                 android:id="@+id/player4_avatar"
                 android:layout_width="match_parent"
                 android:layout_height="0dp"
                 android:layout_weight="0.75"
-                android:src="@drawable/giraffe"/>
-
-            <TextView
-                android:id="@+id/player4_name"
-                android:layout_width="match_parent"
-                android:layout_height="0dp"
-                android:layout_weight="0.25"
-                android:textAlignment="center"
-                android:textColor="@android:color/white" />
+                android:src="@drawable/giraffe" />
 
             <TextView
                 android:id="@+id/player4_bid"
                 android:layout_width="match_parent"
-                android:layout_height="0dp"
-                android:layout_weight="0.25"
+                android:layout_height="wrap_content"
                 android:visibility="invisible"
                 android:textAlignment="center"
-                android:textColor="@android:color/white" />
+                android:layout_marginBottom="4dp"
+                android:textColor="@android:color/white"/>
+            <ImageView
+                android:id="@+id/player4_card"
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                android:layout_weight="0.75"
+                android:src="@drawable/clubs_2"/>
+
         </LinearLayout>
 
 
@@ -172,6 +196,15 @@
             android:layout_gravity="center"
             android:orientation="vertical">
 
+            <TextView
+                android:id="@+id/player5_name"
+                android:layout_width="match_parent"
+                android:layout_height= "wrap_content"
+                android:textAlignment="center"
+                android:layout_marginTop="4dp"
+                android:textSize="16sp"
+                android:textColor="@android:color/white" />
+
             <ImageView
                 android:id="@+id/player5_avatar"
                 android:layout_width="match_parent"
@@ -180,35 +213,40 @@
                 android:src="@drawable/tiger" />
 
             <TextView
-                android:id="@+id/player5_name"
-                android:layout_width="match_parent"
-                android:layout_height="0dp"
-                android:layout_weight="0.25"
-                android:textAlignment="center"
-                android:textColor="@android:color/white" />
-
-            <TextView
                 android:id="@+id/player5_bid"
                 android:layout_width="match_parent"
-                android:layout_height="0dp"
-                android:layout_weight="0.25"
+                android:layout_height="wrap_content"
                 android:visibility="invisible"
                 android:textAlignment="center"
-                android:textColor="@android:color/white" />
-        </LinearLayout>
+                android:layout_marginBottom="4dp"
+                android:textColor="@android:color/white"/>
+            <ImageView
+                android:id="@+id/player5_card"
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                android:layout_weight="0.75"
+                android:src="@drawable/clubs_2"/>
 
+        </LinearLayout>
 
     </GridLayout>
 
     <!-- Partea din centru a imaginii -->
 
     <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="0.30"
+        android:gravity="bottom"
+        android:orientation="vertical">
+
+
+    <LinearLayout
         android:visibility="invisible"
         android:id="@+id/bid_layout"
         android:layout_width="match_parent"
-        android:layout_height="0dp"
+        android:layout_height="match_parent"
         android:layout_gravity="center"
-        android:layout_weight="0.30"
         android:gravity="bottom"
         android:orientation="vertical">
 
@@ -302,7 +340,11 @@
 
 
 
-    <LinearLayout
+    </LinearLayout>
+
+
+
+<LinearLayout
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:layout_weight="0.07">
