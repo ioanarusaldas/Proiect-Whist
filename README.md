@@ -112,11 +112,20 @@ isi vede adversarii in partea de sus)
 15.09 - Rusalda + Sergiu
 - Adaugare textview-uri cu bid-urile si setarea lor dupa ce toata lumea a licitat
 
+16.09 - RUSALDA 
+- fixat bug in care se afisau imaginile gresite ale cartilor
+
+16.09 - Irina + Sergiu + Rusalda
+- am setat ImageView pentru cartile date de adversar si date de jucator
+- an setat onClick pe imaginile jucatorului prin care cartea selectata se
+muta in centru si dispare din "mana"
+
 
 
 ===============================================================================
 
 
+Flow pt dat carti:
 
 BidFinished = True -> 
 - afisam bid-urile

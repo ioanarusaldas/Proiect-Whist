@@ -29,11 +29,11 @@
             <TextView
                 android:id="@+id/player1_name"
                 android:layout_width="match_parent"
-                android:layout_height= "wrap_content"
-                android:textAlignment="center"
+                android:layout_height="wrap_content"
                 android:layout_marginTop="4dp"
-                android:textSize="16sp"
-                android:textColor="@android:color/white" />
+                android:textAlignment="center"
+                android:textColor="@android:color/white"
+                android:textSize="16sp" />
 
             <ImageView
                 android:id="@+id/player1_avatar"
@@ -46,16 +46,17 @@
                 android:id="@+id/player1_bid"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:visibility="invisible"
-                android:textAlignment="center"
                 android:layout_marginBottom="4dp"
-                android:textColor="@android:color/white"/>
+                android:textAlignment="center"
+                android:textColor="@android:color/white"
+                android:visibility="invisible" />
+
             <ImageView
                 android:id="@+id/player1_card"
                 android:layout_width="match_parent"
                 android:layout_height="0dp"
                 android:layout_weight="0.75"
-                android:src="@drawable/clubs_2"/>
+                android:src="@drawable/clubs_2" />
 
         </LinearLayout>
 
@@ -71,11 +72,11 @@
             <TextView
                 android:id="@+id/player2_name"
                 android:layout_width="match_parent"
-                android:layout_height= "wrap_content"
-                android:textAlignment="center"
+                android:layout_height="wrap_content"
                 android:layout_marginTop="4dp"
-                android:textSize="16sp"
-                android:textColor="@android:color/white" />
+                android:textAlignment="center"
+                android:textColor="@android:color/white"
+                android:textSize="16sp" />
 
             <ImageView
                 android:id="@+id/player2_avatar"
@@ -88,16 +89,17 @@
                 android:id="@+id/player2_bid"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:visibility="invisible"
-                android:textAlignment="center"
                 android:layout_marginBottom="4dp"
-                android:textColor="@android:color/white"/>
+                android:textAlignment="center"
+                android:textColor="@android:color/white"
+                android:visibility="invisible" />
+
             <ImageView
                 android:id="@+id/player2_card"
                 android:layout_width="match_parent"
                 android:layout_height="0dp"
                 android:layout_weight="0.75"
-                android:src="@drawable/clubs_2"/>
+                android:src="@drawable/clubs_2" />
 
         </LinearLayout>
 
@@ -113,11 +115,11 @@
             <TextView
                 android:id="@+id/player3_name"
                 android:layout_width="match_parent"
-                android:layout_height= "wrap_content"
-                android:textAlignment="center"
+                android:layout_height="wrap_content"
                 android:layout_marginTop="4dp"
-                android:textSize="16sp"
-                android:textColor="@android:color/white" />
+                android:textAlignment="center"
+                android:textColor="@android:color/white"
+                android:textSize="16sp" />
 
             <ImageView
                 android:id="@+id/player3_avatar"
@@ -130,16 +132,17 @@
                 android:id="@+id/player3_bid"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:visibility="invisible"
-                android:textAlignment="center"
                 android:layout_marginBottom="4dp"
-                android:textColor="@android:color/white"/>
+                android:textAlignment="center"
+                android:textColor="@android:color/white"
+                android:visibility="invisible" />
+
             <ImageView
                 android:id="@+id/player3_card"
                 android:layout_width="match_parent"
                 android:layout_height="0dp"
                 android:layout_weight="0.75"
-                android:src="@drawable/clubs_2"/>
+                android:src="@drawable/clubs_2" />
 
         </LinearLayout>
 
@@ -156,11 +159,11 @@
             <TextView
                 android:id="@+id/player4_name"
                 android:layout_width="match_parent"
-                android:layout_height= "wrap_content"
-                android:textAlignment="center"
+                android:layout_height="wrap_content"
                 android:layout_marginTop="4dp"
-                android:textSize="16sp"
-                android:textColor="@android:color/white" />
+                android:textAlignment="center"
+                android:textColor="@android:color/white"
+                android:textSize="16sp" />
 
             <ImageView
                 android:id="@+id/player4_avatar"
@@ -173,16 +176,17 @@
                 android:id="@+id/player4_bid"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:visibility="invisible"
-                android:textAlignment="center"
                 android:layout_marginBottom="4dp"
-                android:textColor="@android:color/white"/>
+                android:textAlignment="center"
+                android:textColor="@android:color/white"
+                android:visibility="invisible" />
+
             <ImageView
                 android:id="@+id/player4_card"
                 android:layout_width="match_parent"
                 android:layout_height="0dp"
                 android:layout_weight="0.75"
-                android:src="@drawable/clubs_2"/>
+                android:src="@drawable/clubs_2" />
 
         </LinearLayout>
 
@@ -199,11 +203,11 @@
             <TextView
                 android:id="@+id/player5_name"
                 android:layout_width="match_parent"
-                android:layout_height= "wrap_content"
-                android:textAlignment="center"
+                android:layout_height="wrap_content"
                 android:layout_marginTop="4dp"
-                android:textSize="16sp"
-                android:textColor="@android:color/white" />
+                android:textAlignment="center"
+                android:textColor="@android:color/white"
+                android:textSize="16sp" />
 
             <ImageView
                 android:id="@+id/player5_avatar"
@@ -216,16 +220,17 @@
                 android:id="@+id/player5_bid"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:visibility="invisible"
-                android:textAlignment="center"
                 android:layout_marginBottom="4dp"
-                android:textColor="@android:color/white"/>
+                android:textAlignment="center"
+                android:textColor="@android:color/white"
+                android:visibility="invisible" />
+
             <ImageView
                 android:id="@+id/player5_card"
                 android:layout_width="match_parent"
                 android:layout_height="0dp"
                 android:layout_weight="0.75"
-                android:src="@drawable/clubs_2"/>
+                android:src="@drawable/clubs_2" />
 
         </LinearLayout>
 
@@ -241,120 +246,128 @@
         android:orientation="vertical">
 
 
+        <LinearLayout
+            android:id="@+id/bid_layout"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_gravity="center"
+            android:gravity="bottom"
+            android:orientation="vertical"
+            android:visibility="gone">
+
+            <!-- Carti adversari-->
+
+
+            <!-- Butoane bid-->
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="What is your bid?"
+                android:textAlignment="center"
+                android:textColor="@android:color/white" />
+
+
+            <GridLayout
+                android:id="@+id/buttons_grid"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_horizontal"
+                android:columnCount="9"
+                android:orientation="horizontal">
+
+                <Button
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_column="0"
+                    android:layout_columnWeight="1"
+                    android:text="0" />
+
+                <Button
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_column="1"
+                    android:layout_columnWeight="1"
+                    android:text="1" />
+
+                <Button
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_column="2"
+                    android:layout_columnWeight="1"
+                    android:text="2" />
+
+                <Button
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_column="3"
+                    android:layout_columnWeight="1"
+                    android:text="3" />
+
+                <Button
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_column="4"
+                    android:layout_columnWeight="1"
+                    android:text="4" />
+
+                <Button
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_column="5"
+                    android:layout_columnWeight="1"
+                    android:text="5" />
+
+                <Button
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_column="6"
+                    android:layout_columnWeight="1"
+                    android:text="6" />
+
+                <Button
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_column="7"
+                    android:layout_columnWeight="1"
+                    android:text="7" />
+
+                <Button
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_column="8"
+                    android:layout_columnWeight="1"
+                    android:text="8" />
+
+            </GridLayout>
+
+        </LinearLayout>
+
+        <ImageView
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:layout_marginTop="16dp"
+            android:layout_gravity="center"
+            android:id="@+id/myCard"
+            android:visibility="gone"
+            android:src="@drawable/spades_j"/>
+
+
+    </LinearLayout>
+
+
     <LinearLayout
-        android:visibility="invisible"
-        android:id="@+id/bid_layout"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:layout_gravity="center"
-        android:gravity="bottom"
-        android:orientation="vertical">
-
-        <!-- Carti adversari-->
-
-
-        <!-- Butoane bid-->
-
-        <TextView
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="What is your bid?"
-            android:textAlignment="center"
-            android:textColor="@android:color/white" />
-
-
-        <GridLayout
-            android:id="@+id/buttons_grid"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center_horizontal"
-            android:columnCount="9"
-            android:orientation="horizontal">
-
-            <Button
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_column="0"
-                android:layout_columnWeight="1"
-                android:text="0" />
-
-            <Button
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_column="1"
-                android:layout_columnWeight="1"
-                android:text="1" />
-
-            <Button
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_column="2"
-                android:layout_columnWeight="1"
-                android:text="2" />
-
-            <Button
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_column="3"
-                android:layout_columnWeight="1"
-                android:text="3" />
-
-            <Button
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_column="4"
-                android:layout_columnWeight="1"
-                android:text="4" />
-
-            <Button
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_column="5"
-                android:layout_columnWeight="1"
-                android:text="5" />
-
-            <Button
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_column="6"
-                android:layout_columnWeight="1"
-                android:text="6" />
-
-            <Button
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_column="7"
-                android:layout_columnWeight="1"
-                android:text="7" />
-
-            <Button
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_column="8"
-                android:layout_columnWeight="1"
-                android:text="8" />
-
-        </GridLayout>
-
-    </LinearLayout>
-
-
-
-    </LinearLayout>
-
-
-
-<LinearLayout
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:layout_weight="0.07">
+
         <TextView
             android:id="@+id/my_bid_text_view"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:textAlignment="center"
             android:textColor="@android:color/white"
-            android:visibility="invisible"/>
+            android:visibility="invisible" />
     </LinearLayout>
 
     <!-- Aici sunt plasate cartile, layout-ul ocupa 25% din inaltimea ecranului-->

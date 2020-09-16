@@ -111,9 +111,6 @@ public class GameTab extends Fragment {
                 DatabaseReference currPlayerReference = turnReference.child("Player" + (i + 1));
                 currPlayerReference.updateChildren(map);
 
-//                Log.d("cards are:", shuffledCards.subList(gameType * i, gameType * (i + 1)).toString() );
-//                Log.d("ace is", new Integer(R.drawable.clubs_a).toString());
-
                 // Trimitere la server Bids
                 if(i != currentPlayerIndex) {
                     bidReference.child("Player" + (i + 1)).setValue("Pending");
@@ -195,7 +192,7 @@ public class GameTab extends Fragment {
         }
     }
 
-    // metoda care extrage layout-urile din fragment_game_tab si le asunde pe cele nefolositoare
+    // metoda care extrage layout-urile din fragment_game_tab si le ascunde pe cele nefolositoare
     private void hidePlayerAvatars(View rootView) {
 
         ArrayList<LinearLayout> playerLinearLayout = new ArrayList<>(5);
@@ -341,6 +338,8 @@ public class GameTab extends Fragment {
 
                 if(value.equals("True")) {
                     setBidTextViews();
+
+                    setCardOnClick();
                 }
             }
 
@@ -353,6 +352,40 @@ public class GameTab extends Fragment {
             @Override
             public void onCancelled(@NonNull DatabaseError error) {}
         });
+    }
+
+    private void setCardOnClick() {
+
+        for(int i = 0; i < 8; i++) {
+
+            int resId = mContext.getResources().getIdentifier(
+                    "card_slot_" + (i + 1),
+                    "id",
+                    mContext.getPackageName()
+            );
+
+
+            ImageView img = (ImageView) rootView.findViewById(resId);
+            img.setOnClickListener(getImageListener());
+        }
+
+
+    }
+
+    private View.OnClickListener getImageListener() {
+
+        return new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                ImageView imageView = (ImageView) view;
+                imageView.setVisibility(View.GONE);
+                ImageView newImg = (ImageView) rootView.findViewById(R.id.myCard);
+                newImg.setVisibility(View.VISIBLE);
+
+                newImg.setImageDrawable(imageView.getDrawable());
+
+            }
+        };
     }
 
     private void setBidTextViews() {

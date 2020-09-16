@@ -40,7 +40,7 @@ public class CardShuffler {
         List<String> cardsList = Arrays.asList(cardsArray);
 
         // Amesteca lista de carti
-        //Collections.shuffle(cardsList);
+        Collections.shuffle(cardsList);
         return new ArrayList<> (cardsList);
     }
 }
