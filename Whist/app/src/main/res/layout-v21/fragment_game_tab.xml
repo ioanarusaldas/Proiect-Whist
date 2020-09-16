@@ -14,7 +14,7 @@
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:layout_gravity="center_horizontal"
-        android:layout_weight="0.35"
+        android:layout_weight="0.60"
         android:columnCount="5">
 
         <LinearLayout
@@ -26,6 +26,15 @@
             android:layout_gravity="center"
             android:orientation="vertical">
 
+            <TextView
+                android:id="@+id/player1_name"
+                android:layout_width="match_parent"
+                android:layout_height= "wrap_content"
+                android:textAlignment="center"
+                android:layout_marginTop="4dp"
+                android:textSize="16sp"
+                android:textColor="@android:color/white" />
+
             <ImageView
                 android:id="@+id/player1_avatar"
                 android:layout_width="match_parent"
@@ -34,20 +43,19 @@
                 android:src="@drawable/koala" />
 
             <TextView
-                android:id="@+id/player1_name"
-                android:layout_width="match_parent"
-                android:layout_height="0dp"
-                android:layout_weight="0.25"
-                android:textAlignment="center"
-                android:textColor="@android:color/white" />
-            <TextView
                 android:id="@+id/player1_bid"
                 android:layout_width="match_parent"
-                android:layout_height="0dp"
-                android:layout_weight="0.25"
+                android:layout_height="wrap_content"
                 android:visibility="invisible"
                 android:textAlignment="center"
-                android:textColor="@android:color/white" />
+                android:layout_marginBottom="4dp"
+                android:textColor="@android:color/white"/>
+            <ImageView
+                android:id="@+id/player1_card"
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                android:layout_weight="0.75"
+                android:src="@drawable/clubs_2"/>
 
         </LinearLayout>
 
@@ -200,9 +208,14 @@
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:layout_gravity="center"
-        android:layout_weight="0.4"
+        android:layout_weight="0.30"
         android:gravity="bottom"
         android:orientation="vertical">
+
+        <!-- Carti adversari-->
+
+
+        <!-- Butoane bid-->
 
         <TextView
             android:layout_width="match_parent"
