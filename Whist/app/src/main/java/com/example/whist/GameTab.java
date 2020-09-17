@@ -144,6 +144,72 @@ public class GameTab extends Fragment {
                                         // setup
 
 
+    private ChildEventListener handsListener() {
+        return new ChildEventListener() {
+            @Override
+            public void onChildAdded(@NonNull DataSnapshot snapshot, @Nullable String previousChildName) {
+
+                String key = snapshot.getKey();
+                String value = snapshot.getValue(String.class);
+
+                if (key.equals("Player" + myIndex) && value.equals("Current")) {
+                    setCardOnClick();
+                }
+
+            }
+            @Override
+            public void onChildChanged(@NonNull DataSnapshot snapshot, @Nullable String previousChildName) {
+
+                String key = snapshot.getKey();
+                String value = snapshot.getValue(String.class);
+
+                if (key.equals("Player" + myIndex) && value.equals("Current")) {
+                    setCardOnClick();
+                }
+
+                if(key.equals("Player" + myIndex) == false && value.equals("Current") == false) {
+
+                    // extragem indicele
+                    int playerIndex = Character.getNumericValue(key.length() - 1);
+
+                    // ajustam indicele
+                    if(playerIndex > myIndex) {
+                        playerIndex--;
+                    }
+
+                    // extragem id-ul slotului in care punem imaginea
+                    int resId = mContext.getResources().getIdentifier(
+                            "slot_player" + playerIndex,
+                            "id",
+                            mContext.getPackageName()
+                    );
+
+                    // extragem drawable
+                    int drawableId = mContext.getResources().getIdentifier(
+                            value,
+                            "drawable",
+                            mContext.getPackageName()
+                    );
+
+                    ImageView card = rootView.findViewById(resId);
+                    // setare resursa pe slot
+                    card.setImageResource(drawableId);
+                    card.setVisibility(View.VISIBLE);
+                    card.setContentDescription(value);
+                }
+            }
+            @Override
+            public void onChildRemoved(@NonNull DataSnapshot snapshot) {
+            }
+            @Override
+            public void onChildMoved(@NonNull DataSnapshot snapshot, @Nullable String previousChildName) {
+            }
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+            }
+        };
+    }
+
     // metoda care seteaza cate un listener pe fiecare buton de bid
     private void setButtonListeners() {
 
@@ -347,8 +413,7 @@ public class GameTab extends Fragment {
 
                 if(value.equals("True")) {
                     setBidTextViews();
-                    setCardOnClick();
-
+                    handsReference.addChildEventListener(handsListener());
                 }
             }
 
@@ -381,27 +446,30 @@ public class GameTab extends Fragment {
     }
 
     private View.OnClickListener getImageListener() {
-
         return new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 ImageView imageView = (ImageView) view;
                 imageView.setVisibility(View.GONE);
-
                 String card = imageView.getContentDescription().toString();
                 handsReference.child("Player" + myIndex).setValue(card);
                 imageView.setContentDescription(null);
-
                 if (myIndex != playerCount) {
                     handsReference.child("Player" + (myIndex + 1)).setValue("Current");
                 }
-
-
+                for(int i = 0; i < 8; i++) {
+                    int resId = mContext.getResources().getIdentifier(
+                            "card_slot_" + (i + 1),
+                            "id",
+                            mContext.getPackageName()
+                    );
+                    ImageView img = (ImageView) rootView.findViewById(resId);
+                    img.setOnClickListener(null);
+                }
 
                 ImageView newImg = (ImageView) rootView.findViewById(R.id.myCard);
                 newImg.setVisibility(View.VISIBLE);
                 newImg.setImageDrawable(imageView.getDrawable());
-
             }
         };
     }
@@ -418,8 +486,6 @@ public class GameTab extends Fragment {
         TextView myBidTextView = rootView.findViewById(R.id.my_bid_text_view);
         myBidTextView.setVisibility(View.VISIBLE);
         myBidTextView.setText("Bid: " + bids.get(myIndex - 1));
-
-        Log.d("bids are", "bids are: " + bids.toString());
 
         int index = 0;
 

@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
@@ -52,11 +51,11 @@
                 android:visibility="invisible" />
 
             <ImageView
-                android:id="@+id/player1_card"
+                android:id="@+id/slot_player1"
                 android:layout_width="match_parent"
                 android:layout_height="0dp"
                 android:layout_weight="0.75"
-                android:src="@drawable/clubs_2" />
+                android:visibility="invisible" />
 
         </LinearLayout>
 
@@ -95,11 +94,11 @@
                 android:visibility="invisible" />
 
             <ImageView
-                android:id="@+id/player2_card"
+                android:id="@+id/slot_player2"
                 android:layout_width="match_parent"
                 android:layout_height="0dp"
                 android:layout_weight="0.75"
-                android:src="@drawable/clubs_2" />
+                android:visibility="invisible" />
 
         </LinearLayout>
 
@@ -138,11 +137,11 @@
                 android:visibility="invisible" />
 
             <ImageView
-                android:id="@+id/player3_card"
+                android:id="@+id/slot_player3"
                 android:layout_width="match_parent"
                 android:layout_height="0dp"
                 android:layout_weight="0.75"
-                android:src="@drawable/clubs_2" />
+                android:visibility="invisible" />
 
         </LinearLayout>
 
@@ -182,11 +181,11 @@
                 android:visibility="invisible" />
 
             <ImageView
-                android:id="@+id/player4_card"
+                android:id="@+id/slot_player4"
                 android:layout_width="match_parent"
                 android:layout_height="0dp"
                 android:layout_weight="0.75"
-                android:src="@drawable/clubs_2" />
+                android:visibility="invisible" />
 
         </LinearLayout>
 
@@ -226,11 +225,11 @@
                 android:visibility="invisible" />
 
             <ImageView
-                android:id="@+id/player5_card"
+                android:id="@+id/slot_player5"
                 android:layout_width="match_parent"
                 android:layout_height="0dp"
                 android:layout_weight="0.75"
-                android:src="@drawable/clubs_2" />
+                android:visibility="invisible" />
 
         </LinearLayout>
 
