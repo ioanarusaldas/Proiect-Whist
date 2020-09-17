@@ -120,6 +120,12 @@ isi vede adversarii in partea de sus)
 - an setat onClick pe imaginile jucatorului prin care cartea selectata se
 muta in centru si dispare din "mana"
 
+17.09 - Sergiu + Rusalda + Miruna
+- metodele de onclick pe imagini se activeaza doar cand e randul jucatorului
+- se inregisteaza in baza de date cartile date de fiecare jucator
+- jucatorii asculta intrarea "Hands" cu cartile date de adversari si 
+actualizeaza UI-ul cu cartile corespunzatoare (pentru o singura mana,
+ momentan)
 
 
 ===============================================================================
