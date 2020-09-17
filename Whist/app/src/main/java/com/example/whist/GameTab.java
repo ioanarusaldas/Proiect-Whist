@@ -170,7 +170,7 @@ public class GameTab extends Fragment {
                 if(key.equals("Player" + myIndex) == false && value.equals("Current") == false) {
 
                     // extragem indicele
-                    int playerIndex = Character.getNumericValue(key.length() - 1);
+                    int playerIndex = Character.getNumericValue(key.charAt(key.length() - 1));
 
                     // ajustam indicele
                     if(playerIndex > myIndex) {
@@ -183,6 +183,8 @@ public class GameTab extends Fragment {
                             "id",
                             mContext.getPackageName()
                     );
+
+
 
                     // extragem drawable
                     int drawableId = mContext.getResources().getIdentifier(
