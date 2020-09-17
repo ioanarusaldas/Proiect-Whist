@@ -3,12 +3,15 @@ package com.example.whist;
 import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.KeyEvent;
 import android.view.View;
 import android.view.inputmethod.InputMethodManager;
+import android.widget.AbsListView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -56,6 +59,7 @@ public class WaitingRoomActivity extends AppCompatActivity {
                 (this, android.R.layout.simple_list_item_1, playerList);
         // DataBind ListView with items from ArrayAdapter
         mPlayerNameList.setAdapter(arrayAdapter);
+
 
         // adaugam listener pe intrarea "Players" din baza de date
         mPlayerReference = FirebaseDatabase.getInstance().getReference().child("Players");
@@ -110,7 +114,7 @@ public class WaitingRoomActivity extends AppCompatActivity {
 
     // listener pentru intrarea Players din baza de date
     private ChildEventListener playersListener(final ArrayAdapter<String> arrayAdapter) {
-        return new ChildEventListener() {
+            return new ChildEventListener() {
             @Override
             public void onChildAdded(@NonNull DataSnapshot snapshot, @Nullable String previousChildName) {
 

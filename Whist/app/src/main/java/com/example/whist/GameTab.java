@@ -35,6 +35,7 @@ public class GameTab extends Fragment {
 
     private DatabaseReference turnReference;
     private DatabaseReference bidReference;
+    private DatabaseReference handsReference;
 
     // lista bid-urilor
     private final ArrayList<Integer> bids = new ArrayList<>();
@@ -62,6 +63,9 @@ public class GameTab extends Fragment {
         turnReference = FirebaseDatabase.getInstance().getReference().child("Game").child("Turn");
         // creare intrare "Bids" pentru a intreba playerii cate maini vor lua
         bidReference = turnReference.child("Bids");
+        // creare intrare "Hands" pentru a gestiona jocurile
+        handsReference = turnReference.child("Hands");
+
     }
 
     @Override
@@ -91,6 +95,7 @@ public class GameTab extends Fragment {
     private void runGame(View rootView) {
         // (Momentan) se realizeaza un joc de 8
         turn(0, 8, rootView);
+
     }
 
 
@@ -114,11 +119,13 @@ public class GameTab extends Fragment {
                 // Trimitere la server Bids
                 if(i != currentPlayerIndex) {
                     bidReference.child("Player" + (i + 1)).setValue("Pending");
+                    handsReference.child("Player" + (i + 1)).setValue("Pending");
                 }
             }
 
             // setam pe intrarea jucatorului curent faptul ca el este cel care trebuie sa aleaga
             bidReference.child("Player" + (currentPlayerIndex + 1)).setValue("Current");
+            handsReference.child("Player" + (currentPlayerIndex + 1)).setValue("Current");
         }
 
         // Setare listener pe intrarea Player <indicele meu>
@@ -129,8 +136,9 @@ public class GameTab extends Fragment {
         /// Inregistrarea bid-urilor jucatorilor
         // setare listener pe bidReference
         bidReference.addChildEventListener(bidListener());
-
     }
+
+
 
     ////////////////////////////////////////////////////////////////////////////////////////////
                                         // setup
@@ -252,6 +260,7 @@ public class GameTab extends Fragment {
                     ImageView card = rootView.findViewById(resId);
                     // setare resursa pe slot
                     card.setImageResource(drawableId);
+                    card.setContentDescription(myCards.get(i));
                 }
             }
 
@@ -338,8 +347,8 @@ public class GameTab extends Fragment {
 
                 if(value.equals("True")) {
                     setBidTextViews();
-
                     setCardOnClick();
+
                 }
             }
 
@@ -367,9 +376,8 @@ public class GameTab extends Fragment {
 
             ImageView img = (ImageView) rootView.findViewById(resId);
             img.setOnClickListener(getImageListener());
+
         }
-
-
     }
 
     private View.OnClickListener getImageListener() {
@@ -379,9 +387,19 @@ public class GameTab extends Fragment {
             public void onClick(View view) {
                 ImageView imageView = (ImageView) view;
                 imageView.setVisibility(View.GONE);
+
+                String card = imageView.getContentDescription().toString();
+                handsReference.child("Player" + myIndex).setValue(card);
+                imageView.setContentDescription(null);
+
+                if (myIndex != playerCount) {
+                    handsReference.child("Player" + (myIndex + 1)).setValue("Current");
+                }
+
+
+
                 ImageView newImg = (ImageView) rootView.findViewById(R.id.myCard);
                 newImg.setVisibility(View.VISIBLE);
-
                 newImg.setImageDrawable(imageView.getDrawable());
 
             }
