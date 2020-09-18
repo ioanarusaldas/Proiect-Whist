@@ -33,10 +33,13 @@ public class GameTab extends Fragment {
     private int playerCount;
     private int myIndex;
     private String color;
+    private int handsLeft;
 
     private DatabaseReference turnReference;
     private DatabaseReference bidReference;
     private DatabaseReference handsReference;
+    private DatabaseReference handsLeftReference;
+    private DatabaseReference scoreReference;
 
     // lista bid-urilor
     private final ArrayList<Integer> bids = new ArrayList<>();
@@ -67,6 +70,8 @@ public class GameTab extends Fragment {
         bidReference = turnReference.child("Bids");
         // creare intrare "Hands" pentru a gestiona jocurile
         handsReference = turnReference.child("Hands");
+        handsLeftReference = turnReference.child("HandsLeft");
+        scoreReference = turnReference.child("Score");
 
     }
 
@@ -103,6 +108,7 @@ public class GameTab extends Fragment {
 
     public void turn(final int currentPlayerIndex, int gameType) {
 
+
         // Cod executat doar de jucatorul care este la rand sa faca bid
         if (currentPlayerIndex + 1 == myIndex) {
             // Amestecare carti + trimitere la server
@@ -123,12 +129,15 @@ public class GameTab extends Fragment {
                     bidReference.child("Player" + (i + 1)).setValue("Pending");
                     handsReference.child("Player" + (i + 1)).setValue("Pending");
                 }
+                scoreReference.child("Player" + (i +1)).setValue(0);
             }
 
             // setam pe intrarea jucatorului curent faptul ca el este cel care trebuie sa aleaga
             bidReference.child("Player" + (currentPlayerIndex + 1)).setValue("Current");
             handsReference.child("Player" + (currentPlayerIndex + 1)).setValue("Current");
             handsReference.child("Color").setValue("null");
+            handsLeftReference.child("HandsLeft").setValue(gameType);
+            handsLeft = gameType;
         }
 
         // Setare listener pe intrarea Player <indicele meu>
@@ -140,6 +149,36 @@ public class GameTab extends Fragment {
         // setare listener pe bidReference
         bidReference.addChildEventListener(bidListener());
         handsReference.addChildEventListener(colorChanged());
+        handsLeftReference.addChildEventListener(handsLeftChanged());
+    }
+
+    private ChildEventListener handsLeftChanged() {
+        return new ChildEventListener() {
+            @Override
+            public void onChildAdded(@NonNull DataSnapshot snapshot, @Nullable String previousChildName) {
+                handsLeft = snapshot.getValue(Integer.class);
+            }
+
+            @Override
+            public void onChildChanged(@NonNull DataSnapshot snapshot, @Nullable String previousChildName) {
+                handsLeft = snapshot.getValue(Integer.class);
+            }
+
+            @Override
+            public void onChildRemoved(@NonNull DataSnapshot snapshot) {
+
+            }
+
+            @Override
+            public void onChildMoved(@NonNull DataSnapshot snapshot, @Nullable String previousChildName) {
+
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+
+            }
+        };
     }
 
     private ChildEventListener colorChanged() {
@@ -463,7 +502,8 @@ public class GameTab extends Fragment {
                 }
 
                 // daca alt jucator a dat o carte, afisam cartea in dreptul sau
-                if(key.equals("Player" + myIndex) == false && value.equals("Current") == false) {
+                if(key.equals("Player" + myIndex) == false && value.equals("Current") == false &&
+                key.equals("Color") == false) {
 
                     // extragem indicele
                     int playerIndex = Character.getNumericValue(key.charAt(key.length() - 1));
@@ -508,7 +548,7 @@ public class GameTab extends Fragment {
 
     // mmetoda care seteaza onClick pe carti
     private void setCardOnClick() {
-
+        Boolean sameColorCard = false;
         for(int i = 0; i < 8; i++) {
             // extragere id al cartii in functie de nume
             int resId = mContext.getResources().getIdentifier(
@@ -519,8 +559,31 @@ public class GameTab extends Fragment {
 
             // setare listener pe carte
             ImageView img = (ImageView) rootView.findViewById(resId);
-            img.setOnClickListener(cardOnClickListener());
+            String cardColor = extractColor(img.getContentDescription().toString());
+            if((color.equals("null") == false) && (cardColor.equals(color))) {
+                img.setOnClickListener(cardOnClickListener());
+                sameColorCard = true ;
+            }
+            if (color.equals("null")) {
+                img.setOnClickListener(cardOnClickListener());
+            }
+
         }
+        if (sameColorCard == false) {
+            for (int i = 0; i < 8; i++) {
+                // extragere id al cartii in functie de nume
+                int resId = mContext.getResources().getIdentifier(
+                        "card_slot_" + (i + 1),
+                        "id",
+                        mContext.getPackageName()
+                );
+
+                // setare listener pe carte
+                ImageView img = (ImageView) rootView.findViewById(resId);
+                img.setOnClickListener(cardOnClickListener());
+            }
+        }
+
     }
 
     // onClick pentru o carte
@@ -541,16 +604,14 @@ public class GameTab extends Fragment {
                 imageView.setContentDescription(null);
 
                 if(color.equals("null")) {
-                    int index = cardName.indexOf('_');
-                    String newColor = cardName.substring(0,index);
-                    handsReference.child("Color").setValue(newColor);
+                    handsReference.child("Color").setValue(extractColor(cardName));
                 }
-                
-
                 // cu exceptia cazului in care jucatorul este ultimul, se seteaza "Current" pe intrarea
                 // urmatorului jucator pentru a-l anunta ca el trebuie sa dea carte
                 if (myIndex != playerCount) {
                     handsReference.child("Player" + (myIndex + 1)).setValue("Current");
+                } else {
+                    handsLeftReference.child("HandsLeft").setValue(handsLeft - 1);
                 }
                 // se elimina metodele de onClick de pe imagini
                 for(int i = 0; i < 8; i++) {
@@ -568,5 +629,10 @@ public class GameTab extends Fragment {
                 newImg.setImageDrawable(imageView.getDrawable());
             }
         };
+    }
+    private String extractColor(String cardName) {
+        int index = cardName.indexOf('_');
+        String newColor = cardName.substring(0,index);
+        return  newColor;
     }
 }

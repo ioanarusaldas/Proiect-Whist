@@ -24,6 +24,7 @@ public class CardShuffler {
             "hearts_2", "spades_2", "clubs_2", "diamonds_2",
     };
 
+
     /*
         Intoarce un String Array cu cartile amestecate
         Parametru: numarul de jucatori
@@ -40,7 +41,7 @@ public class CardShuffler {
         List<String> cardsList = Arrays.asList(cardsArray);
 
         // Amesteca lista de carti
-        Collections.shuffle(cardsList);
+       Collections.shuffle(cardsList);
         return new ArrayList<> (cardsList);
     }
 }
