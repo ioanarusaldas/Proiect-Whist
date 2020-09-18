@@ -2,6 +2,7 @@ package com.example.whist;
 
 import android.content.Context;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -31,6 +32,7 @@ public class GameTab extends Fragment {
     private ArrayList<String> players;
     private int playerCount;
     private int myIndex;
+    private String color;
 
     private DatabaseReference turnReference;
     private DatabaseReference bidReference;
@@ -41,6 +43,7 @@ public class GameTab extends Fragment {
 
     private View rootView;
     private Context mContext;
+
 
     public GameTab() {}
 
@@ -125,6 +128,7 @@ public class GameTab extends Fragment {
             // setam pe intrarea jucatorului curent faptul ca el este cel care trebuie sa aleaga
             bidReference.child("Player" + (currentPlayerIndex + 1)).setValue("Current");
             handsReference.child("Player" + (currentPlayerIndex + 1)).setValue("Current");
+            handsReference.child("Color").setValue("null");
         }
 
         // Setare listener pe intrarea Player <indicele meu>
@@ -135,8 +139,45 @@ public class GameTab extends Fragment {
         /// Inregistrarea bid-urilor jucatorilor
         // setare listener pe bidReference
         bidReference.addChildEventListener(bidListener());
+        handsReference.addChildEventListener(colorChanged());
     }
 
+    private ChildEventListener colorChanged() {
+        return  new ChildEventListener() {
+            @Override
+            public void onChildAdded(@NonNull DataSnapshot snapshot, @Nullable String previousChildName) {
+                String key = snapshot.getKey();
+                String value = snapshot.getValue(String.class);
+                if (key.equals("Color") ) {
+                    color = value;
+                }
+            }
+
+            @Override
+            public void onChildChanged(@NonNull DataSnapshot snapshot, @Nullable String previousChildName) {
+                String key = snapshot.getKey();
+                String value = snapshot.getValue(String.class);
+                if (key.equals("Color")) {
+                    color = value;
+                }
+            }
+
+            @Override
+            public void onChildRemoved(@NonNull DataSnapshot snapshot) {
+
+            }
+
+            @Override
+            public void onChildMoved(@NonNull DataSnapshot snapshot, @Nullable String previousChildName) {
+
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+
+            }
+        };
+    }
 
 
     ////////////////////////////////////////////////////////////////////////////////////////////
@@ -490,12 +531,22 @@ public class GameTab extends Fragment {
                 ImageView imageView = (ImageView) view;
                 // setare vizibilitate pe gone
                 imageView.setVisibility(View.GONE);
+
                 // extragere nume carte din descrierea ei
                 String cardName = imageView.getContentDescription().toString();
+
                 // se trimite la baza de date numele cartii care a fost data
                 handsReference.child("Player" + myIndex).setValue(cardName);
                 // se sterge descrierea de pe carte
                 imageView.setContentDescription(null);
+
+                if(color.equals("null")) {
+                    int index = cardName.indexOf('_');
+                    String newColor = cardName.substring(0,index);
+                    handsReference.child("Color").setValue(newColor);
+                }
+                
+
                 // cu exceptia cazului in care jucatorul este ultimul, se seteaza "Current" pe intrarea
                 // urmatorului jucator pentru a-l anunta ca el trebuie sa dea carte
                 if (myIndex != playerCount) {
