@@ -347,7 +347,7 @@
             android:layout_height="match_parent"
             android:layout_marginTop="16dp"
             android:layout_gravity="center"
-            android:id="@+id/myCard"
+            android:id="@+id/my_card_slot"
             android:visibility="gone"
             android:src="@drawable/spades_j"/>
 
