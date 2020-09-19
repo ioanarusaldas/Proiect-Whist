@@ -2,7 +2,6 @@ package com.example.whist;
 
 import android.content.Context;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -48,7 +47,8 @@ public class GameTab extends Fragment {
     private Context mContext;
 
 
-    public GameTab() {}
+    public GameTab() {
+    }
 
     @Override
     public void onAttach(@NonNull Context context) {
@@ -125,11 +125,11 @@ public class GameTab extends Fragment {
                 currPlayerReference.updateChildren(map);
 
                 // Trimitere la server Bids
-                if(i != currentPlayerIndex) {
+                if (i != currentPlayerIndex) {
                     bidReference.child("Player" + (i + 1)).setValue("Pending");
                     handsReference.child("Player" + (i + 1)).setValue("Pending");
                 }
-                scoreReference.child("Player" + (i +1)).setValue(0);
+                scoreReference.child("Player" + (i + 1)).setValue(0);
             }
 
             // setam pe intrarea jucatorului curent faptul ca el este cel care trebuie sa aleaga
@@ -146,12 +146,13 @@ public class GameTab extends Fragment {
 
 
         /// Inregistrarea bid-urilor jucatorilor
-        // setare listener pe bidReference
+        // setare listener pe bidReference si pe handsLeftReference si pe intrarea "Color"
         bidReference.addChildEventListener(bidListener());
         handsReference.addChildEventListener(colorChanged());
         handsLeftReference.addChildEventListener(handsLeftChanged());
     }
 
+    // listener pentru setarea variabilei handsLeft
     private ChildEventListener handsLeftChanged() {
         return new ChildEventListener() {
             @Override
@@ -166,72 +167,31 @@ public class GameTab extends Fragment {
 
             @Override
             public void onChildRemoved(@NonNull DataSnapshot snapshot) {
-
             }
 
             @Override
             public void onChildMoved(@NonNull DataSnapshot snapshot, @Nullable String previousChildName) {
-
             }
 
             @Override
             public void onCancelled(@NonNull DatabaseError error) {
-
             }
         };
     }
-
-    private ChildEventListener colorChanged() {
-        return  new ChildEventListener() {
-            @Override
-            public void onChildAdded(@NonNull DataSnapshot snapshot, @Nullable String previousChildName) {
-                String key = snapshot.getKey();
-                String value = snapshot.getValue(String.class);
-                if (key.equals("Color") ) {
-                    color = value;
-                }
-            }
-
-            @Override
-            public void onChildChanged(@NonNull DataSnapshot snapshot, @Nullable String previousChildName) {
-                String key = snapshot.getKey();
-                String value = snapshot.getValue(String.class);
-                if (key.equals("Color")) {
-                    color = value;
-                }
-            }
-
-            @Override
-            public void onChildRemoved(@NonNull DataSnapshot snapshot) {
-
-            }
-
-            @Override
-            public void onChildMoved(@NonNull DataSnapshot snapshot, @Nullable String previousChildName) {
-
-            }
-
-            @Override
-            public void onCancelled(@NonNull DatabaseError error) {
-
-            }
-        };
-    }
-
 
     ////////////////////////////////////////////////////////////////////////////////////////////
-                                        // setup
+    // setup
 
 
     // metoda care seteaza cate un listener pe fiecare buton de bid
     private void setButtonListeners() {
 
-        GridLayout buttonsGrid = (GridLayout) rootView.findViewById(R.id.buttons_grid);
-        final LinearLayout bidLayout = (LinearLayout) rootView.findViewById(R.id.bid_layout);
+        GridLayout buttonsGrid = rootView.findViewById(R.id.buttons_grid);
+        final LinearLayout bidLayout = rootView.findViewById(R.id.bid_layout);
         int buttonsCount = buttonsGrid.getChildCount();
 
-        for(int i = 0; i < buttonsCount; i++){
-            Button b = (Button)buttonsGrid.getChildAt(i);
+        for (int i = 0; i < buttonsCount; i++) {
+            Button b = (Button) buttonsGrid.getChildAt(i);
             b.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
@@ -248,10 +208,10 @@ public class GameTab extends Fragment {
 
                     // setam valoarea "Current" in baza de date pentru persoana urmatoare
                     // daca toata lumea a pariat, setam bid = true pentru a trece la partea de dat carti
-                    if(myIndex < playerCount) {
+                    if (myIndex < playerCount) {
                         bidReference.child("Player" + (myIndex + 1)).setValue("Current");
 
-                    } else if(myIndex == playerCount){
+                    } else if (myIndex == playerCount) {
                         // aici: se executa codul de dupa partea de bid
                         turnReference.child("BidFinished").child("IsFinished").setValue("True");
                     }
@@ -331,8 +291,9 @@ public class GameTab extends Fragment {
         }
     }
 
+
     ///////////////////////////////////////////////////////////////////////////////////////////////
-                                        // Listeneri
+    // Listeneri
 
     // listener pe intrarea "Player"
     private ChildEventListener myPlayerListener() {
@@ -368,16 +329,20 @@ public class GameTab extends Fragment {
             }
 
             @Override
-            public void onChildChanged(@NonNull DataSnapshot snapshot, @Nullable String previousChildName) {}
+            public void onChildChanged(@NonNull DataSnapshot snapshot, @Nullable String previousChildName) {
+            }
 
             @Override
-            public void onChildRemoved(@NonNull DataSnapshot snapshot) {}
+            public void onChildRemoved(@NonNull DataSnapshot snapshot) {
+            }
 
             @Override
-            public void onChildMoved(@NonNull DataSnapshot snapshot, @Nullable String previousChildName) {}
+            public void onChildMoved(@NonNull DataSnapshot snapshot, @Nullable String previousChildName) {
+            }
 
             @Override
-            public void onCancelled(@NonNull DatabaseError error) {}
+            public void onCancelled(@NonNull DatabaseError error) {
+            }
         };
     }
 
@@ -390,15 +355,15 @@ public class GameTab extends Fragment {
                 String key = snapshot.getKey();
                 String result = snapshot.getValue(String.class);
 
-                if(key.equals("Player" + (myIndex)) && result.equals("Current")) {
+                if (key.equals("Player" + (myIndex)) && result.equals("Current")) {
 
                     // setam vizibilitatea layout-ului din mijloc pe true
-                    LinearLayout bidLayout = (LinearLayout) rootView.findViewById(R.id.bid_layout);
+                    LinearLayout bidLayout = rootView.findViewById(R.id.bid_layout);
                     bidLayout.setVisibility(View.VISIBLE);
 
                 } else {
                     // adaugam in arraylist valorile numerice
-                    if(result.equals("Current") == false && result.equals("Pending") == false) {
+                    if (!result.equals("Current") && !result.equals("Pending")) {
                         bids.add(Integer.parseInt(result));
                     }
                 }
@@ -413,28 +378,31 @@ public class GameTab extends Fragment {
                 // adaugam pe ecran partea de bid, intrebam utilizatorul cate maini ia, trimitem rezultatul
                 // la server, ascundem partea de bid, setam pt
                 // urmatorul player Current (daca nu suntem ultimii)
-                if(key.equals("Player" + (myIndex)) && result.equals("Current")) {
+                if (key.equals("Player" + (myIndex)) && result.equals("Current")) {
 
                     // setam vizibilitatea layout-ului din mijloc pe true
-                    LinearLayout bidLayout = (LinearLayout) rootView.findViewById(R.id.bid_layout);
+                    LinearLayout bidLayout = rootView.findViewById(R.id.bid_layout);
                     bidLayout.setVisibility(View.VISIBLE);
 
                 } else {
                     // adaugam in arraylist valorile numerice
-                    if(result.equals("Current") == false && result.equals("Pending") == false) {
+                    if (!result.equals("Current") && !result.equals("Pending")) {
                         bids.add(Integer.parseInt(result));
                     }
                 }
             }
 
             @Override
-            public void onChildRemoved(@NonNull DataSnapshot snapshot) {}
+            public void onChildRemoved(@NonNull DataSnapshot snapshot) {
+            }
 
             @Override
-            public void onChildMoved(@NonNull DataSnapshot snapshot, @Nullable String previousChildName) {}
+            public void onChildMoved(@NonNull DataSnapshot snapshot, @Nullable String previousChildName) {
+            }
 
             @Override
-            public void onCancelled(@NonNull DatabaseError error) {}
+            public void onCancelled(@NonNull DatabaseError error) {
+            }
         };
     }
 
@@ -449,7 +417,7 @@ public class GameTab extends Fragment {
                 String value = snapshot.getValue(String.class);
                 // cand intrarea BidFinished are valoarea true, afisam bid-urile fiecarui jucator si
                 // setam listener-ul de pe intrarea hands
-                if(value.equals("True")) {
+                if (value.equals("True")) {
                     setBidTextViews();
                     handsReference.addChildEventListener(handsListener());
                 }
@@ -460,22 +428,26 @@ public class GameTab extends Fragment {
                 String value = snapshot.getValue(String.class);
                 // cand intrarea BidFinished are valoarea true, afisam bid-urile fiecarui jucator si
                 // setam listener-ul de pe intrarea hands
-                if(value.equals("True")) {
+                if (value.equals("True")) {
                     setBidTextViews();
                     handsReference.addChildEventListener(handsListener());
                 }
             }
 
             @Override
-            public void onChildRemoved(@NonNull DataSnapshot snapshot) {}
+            public void onChildRemoved(@NonNull DataSnapshot snapshot) {
+            }
 
             @Override
-            public void onChildMoved(@NonNull DataSnapshot snapshot, @Nullable String previousChildName) {}
+            public void onChildMoved(@NonNull DataSnapshot snapshot, @Nullable String previousChildName) {
+            }
 
             @Override
-            public void onCancelled(@NonNull DatabaseError error) {}
+            public void onCancelled(@NonNull DatabaseError error) {
+            }
         });
     }
+
 
     // listener pe intrarea hands
     private ChildEventListener handsListener() {
@@ -491,6 +463,7 @@ public class GameTab extends Fragment {
                 }
 
             }
+
             @Override
             public void onChildChanged(@NonNull DataSnapshot snapshot, @Nullable String previousChildName) {
                 // setare onClick pe carti atunci cand este randul jucatorului curent
@@ -502,14 +475,13 @@ public class GameTab extends Fragment {
                 }
 
                 // daca alt jucator a dat o carte, afisam cartea in dreptul sau
-                if(key.equals("Player" + myIndex) == false && value.equals("Current") == false &&
-                key.equals("Color") == false) {
+                if (!key.equals("Player" + myIndex) && !value.equals("Current") && !key.equals("Color")) {
 
                     // extragem indicele
                     int playerIndex = Character.getNumericValue(key.charAt(key.length() - 1));
 
                     // ajustam indicele (pentru a pune cartea in slot-ul corect)
-                    if(playerIndex > myIndex) {
+                    if (playerIndex > myIndex) {
                         playerIndex--;
                     }
 
@@ -534,22 +506,65 @@ public class GameTab extends Fragment {
                     card.setContentDescription(value);
                 }
             }
+
             @Override
             public void onChildRemoved(@NonNull DataSnapshot snapshot) {
             }
+
             @Override
             public void onChildMoved(@NonNull DataSnapshot snapshot, @Nullable String previousChildName) {
             }
+
             @Override
             public void onCancelled(@NonNull DatabaseError error) {
             }
         };
     }
 
+    // listener pentru intratea "Color" din turn
+    private ChildEventListener colorChanged() {
+        return new ChildEventListener() {
+            @Override
+            public void onChildAdded(@NonNull DataSnapshot snapshot, @Nullable String previousChildName) {
+                String key = snapshot.getKey();
+                String value = snapshot.getValue(String.class);
+                if (key.equals("Color")) {
+                    color = value;
+                }
+            }
+
+            @Override
+            public void onChildChanged(@NonNull DataSnapshot snapshot, @Nullable String previousChildName) {
+                String key = snapshot.getKey();
+                String value = snapshot.getValue(String.class);
+                if (key.equals("Color")) {
+                    color = value;
+                }
+            }
+
+            @Override
+            public void onChildRemoved(@NonNull DataSnapshot snapshot) {
+            }
+
+            @Override
+            public void onChildMoved(@NonNull DataSnapshot snapshot, @Nullable String previousChildName) {
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+            }
+        };
+    }
+
+
+    ////////////////////////////////////////////////////////////////////////////////////////////////
+    // Alte metode
+
+
     // mmetoda care seteaza onClick pe carti
     private void setCardOnClick() {
-        Boolean sameColorCard = false;
-        for(int i = 0; i < 8; i++) {
+        boolean sameColorCard = false;
+        for (int i = 0; i < 8; i++) {
             // extragere id al cartii in functie de nume
             int resId = mContext.getResources().getIdentifier(
                     "card_slot_" + (i + 1),
@@ -558,18 +573,20 @@ public class GameTab extends Fragment {
             );
 
             // setare listener pe carte
-            ImageView img = (ImageView) rootView.findViewById(resId);
+            // se verifica daca s-a gasit vreo carte de aceeasi culoare cu cea care este deja data
+            ImageView img = rootView.findViewById(resId);
             String cardColor = extractColor(img.getContentDescription().toString());
-            if((color.equals("null") == false) && (cardColor.equals(color))) {
+            if (!(color.equals("null")) && (cardColor.equals(color))) {
                 img.setOnClickListener(cardOnClickListener());
-                sameColorCard = true ;
+                sameColorCard = true;
             }
             if (color.equals("null")) {
                 img.setOnClickListener(cardOnClickListener());
             }
 
         }
-        if (sameColorCard == false) {
+        // daca nu s-a gasit nicio carte de aceeasi culoare, se seteaza onclick pe toate cartile
+        if (!sameColorCard && !(color.equals("null"))) {
             for (int i = 0; i < 8; i++) {
                 // extragere id al cartii in functie de nume
                 int resId = mContext.getResources().getIdentifier(
@@ -579,7 +596,7 @@ public class GameTab extends Fragment {
                 );
 
                 // setare listener pe carte
-                ImageView img = (ImageView) rootView.findViewById(resId);
+                ImageView img = rootView.findViewById(resId);
                 img.setOnClickListener(cardOnClickListener());
             }
         }
@@ -603,36 +620,39 @@ public class GameTab extends Fragment {
                 // se sterge descrierea de pe carte
                 imageView.setContentDescription(null);
 
-                if(color.equals("null")) {
+                if (color.equals("null")) {
                     handsReference.child("Color").setValue(extractColor(cardName));
                 }
                 // cu exceptia cazului in care jucatorul este ultimul, se seteaza "Current" pe intrarea
                 // urmatorului jucator pentru a-l anunta ca el trebuie sa dea carte
+                // daca player-ul este ultimul (TODO - trebuie schimbat - daca playerul este ultimul care trebuie sa dea)
+                // actualizam handsLeft
                 if (myIndex != playerCount) {
                     handsReference.child("Player" + (myIndex + 1)).setValue("Current");
                 } else {
                     handsLeftReference.child("HandsLeft").setValue(handsLeft - 1);
                 }
                 // se elimina metodele de onClick de pe imagini
-                for(int i = 0; i < 8; i++) {
+                for (int i = 0; i < 8; i++) {
                     int resId = mContext.getResources().getIdentifier(
                             "card_slot_" + (i + 1),
                             "id",
                             mContext.getPackageName()
                     );
-                    ImageView img = (ImageView) rootView.findViewById(resId);
+                    ImageView img = rootView.findViewById(resId);
                     img.setOnClickListener(null);
                 }
                 // setare imagine cu cartea data pe slotul jucatorului curent
-                ImageView newImg = (ImageView) rootView.findViewById(R.id.my_card_slot);
+                ImageView newImg = rootView.findViewById(R.id.my_card_slot);
                 newImg.setVisibility(View.VISIBLE);
                 newImg.setImageDrawable(imageView.getDrawable());
             }
         };
     }
+
+    // metoda care extrage un string cu culoarea unei carti
     private String extractColor(String cardName) {
         int index = cardName.indexOf('_');
-        String newColor = cardName.substring(0,index);
-        return  newColor;
+        return cardName.substring(0, index);
     }
 }

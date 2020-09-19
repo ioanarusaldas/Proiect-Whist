@@ -149,6 +149,19 @@ reprezentand valoarea resursei imaginii cartii pe care a dat-o, fiecare player v
 cartea corespunzatoare in dreptul jucatorului care a dat-o.
 
 
+===============================================================================
+
+- cand incepe mana, se seteaza color = null (cand se termina partea de bid)
+- fiecare player seteaza listener pe color si retine in cod valoarea ei la fiecare
+modificare
+
+- daca color == null, in functie de cartea data de mine, voi seta in baza de date
+culoarea si voi putea da orice carte
+
+- daca color e diferit de null, pot da doar cartile care egale cu color (daca am)
+daca nu, pot da orice carte
+
+
 
 
 

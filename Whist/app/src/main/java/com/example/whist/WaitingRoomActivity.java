@@ -46,7 +46,6 @@ public class WaitingRoomActivity extends AppCompatActivity {
     private boolean disconnected = false;
 
 
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -109,12 +108,11 @@ public class WaitingRoomActivity extends AppCompatActivity {
     }
 
 
-
     //////////////////////// Metode care seteaza listeneri //////////////////////////////
 
     // listener pentru intrarea Players din baza de date
     private ChildEventListener playersListener(final ArrayAdapter<String> arrayAdapter) {
-            return new ChildEventListener() {
+        return new ChildEventListener() {
             @Override
             public void onChildAdded(@NonNull DataSnapshot snapshot, @Nullable String previousChildName) {
 
@@ -140,11 +138,11 @@ public class WaitingRoomActivity extends AppCompatActivity {
             public void onChildChanged(@NonNull DataSnapshot snapshot, @Nullable String previousChildName) {
 
                 // daca NU ne-am deconectat (la modificarea unui nume de jucator):
-                if (disconnected == false) {
+                if (!disconnected) {
 
                     // la schimbarea numelui jucatorului, actualizam ListView
                     String changedPlayer = snapshot.getValue(String.class);
-                    Integer modifiedIndex;
+                    int modifiedIndex;
                     if (previousChildName == null) {
                         modifiedIndex = 0;
                     } else {
@@ -198,7 +196,8 @@ public class WaitingRoomActivity extends AppCompatActivity {
     private ChildEventListener statusListener() {
         return new ChildEventListener() {
             @Override
-            public void onChildAdded(@NonNull DataSnapshot snapshot, @Nullable String previousChildName) {}
+            public void onChildAdded(@NonNull DataSnapshot snapshot, @Nullable String previousChildName) {
+            }
 
             @Override
             public void onChildChanged(@NonNull DataSnapshot snapshot, @Nullable String previousChildName) {
@@ -206,7 +205,7 @@ public class WaitingRoomActivity extends AppCompatActivity {
                 String gameState = snapshot.getValue(String.class);
                 // Daca altcineva a apasat butonul de start, acest lucru este semnalat de modificarea intrarii
                 // "Status" - se creaza un intent si se porneste GameActivity
-                if(key.equals("Started") && gameState.equals("True")) {
+                if (key.equals("Started") && gameState.equals("True")) {
 
                     Intent intent = new Intent(WaitingRoomActivity.this, GameActivity.class);
                     intent.putExtra("myIndex", playerIndex);
@@ -216,13 +215,16 @@ public class WaitingRoomActivity extends AppCompatActivity {
             }
 
             @Override
-            public void onChildRemoved(@NonNull DataSnapshot snapshot) {}
+            public void onChildRemoved(@NonNull DataSnapshot snapshot) {
+            }
 
             @Override
-            public void onChildMoved(@NonNull DataSnapshot snapshot, @Nullable String previousChildName) {}
+            public void onChildMoved(@NonNull DataSnapshot snapshot, @Nullable String previousChildName) {
+            }
 
             @Override
-            public void onCancelled(@NonNull DatabaseError error) {}
+            public void onCancelled(@NonNull DatabaseError error) {
+            }
         };
     }
 
