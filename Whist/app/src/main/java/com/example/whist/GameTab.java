@@ -30,6 +30,7 @@ public class GameTab extends Fragment {
 
     private ArrayList<String> players;
     private int playerCount;
+
     private int myIndex;
     private String color;
     private int handsLeft;
@@ -45,6 +46,10 @@ public class GameTab extends Fragment {
 
     private View rootView;
     private Context mContext;
+
+
+    // variabila folosita pentru a stabili ordinea in care se executa comenzi in joc
+    private int lastPlayerIndex;
 
 
     public GameTab() {
@@ -68,7 +73,7 @@ public class GameTab extends Fragment {
         turnReference = FirebaseDatabase.getInstance().getReference().child("Game").child("Turn");
         // creare intrare "Bids" pentru a intreba playerii cate maini vor lua
         bidReference = turnReference.child("Bids");
-        // creare intrare "Hands" pentru a gestiona jocurile
+        // creare intrare "Hands" pentru a gestiona jocurile, handsLeft pentru maini ramase, Score pentru a gestiona scorul (maini luate
         handsReference = turnReference.child("Hands");
         handsLeftReference = turnReference.child("HandsLeft");
         scoreReference = turnReference.child("Score");
@@ -106,11 +111,12 @@ public class GameTab extends Fragment {
     }
 
 
-    public void turn(final int currentPlayerIndex, int gameType) {
+    public void turn(final int firstPlayerIndex, int gameType) {
 
+        lastPlayerIndex = setLastPlayerIndex(firstPlayerIndex);
 
         // Cod executat doar de jucatorul care este la rand sa faca bid
-        if (currentPlayerIndex + 1 == myIndex) {
+        if (firstPlayerIndex + 1 == myIndex) {
             // Amestecare carti + trimitere la server
             ArrayList<String> shuffledCards = CardShuffler.shuffleCards(playerCount);
             Map<String, Object> map = new HashMap<>();
@@ -125,7 +131,7 @@ public class GameTab extends Fragment {
                 currPlayerReference.updateChildren(map);
 
                 // Trimitere la server Bids
-                if (i != currentPlayerIndex) {
+                if (i != firstPlayerIndex) {
                     bidReference.child("Player" + (i + 1)).setValue("Pending");
                     handsReference.child("Player" + (i + 1)).setValue("Pending");
                 }
@@ -133,8 +139,8 @@ public class GameTab extends Fragment {
             }
 
             // setam pe intrarea jucatorului curent faptul ca el este cel care trebuie sa aleaga
-            bidReference.child("Player" + (currentPlayerIndex + 1)).setValue("Current");
-            handsReference.child("Player" + (currentPlayerIndex + 1)).setValue("Current");
+            bidReference.child("Player" + (firstPlayerIndex + 1)).setValue("Current");
+            handsReference.child("Player" + (firstPlayerIndex + 1)).setValue("Current");
             handsReference.child("Color").setValue("null");
             handsLeftReference.child("HandsLeft").setValue(gameType);
             handsLeft = gameType;
@@ -152,35 +158,8 @@ public class GameTab extends Fragment {
         handsLeftReference.addChildEventListener(handsLeftChanged());
     }
 
-    // listener pentru setarea variabilei handsLeft
-    private ChildEventListener handsLeftChanged() {
-        return new ChildEventListener() {
-            @Override
-            public void onChildAdded(@NonNull DataSnapshot snapshot, @Nullable String previousChildName) {
-                handsLeft = snapshot.getValue(Integer.class);
-            }
-
-            @Override
-            public void onChildChanged(@NonNull DataSnapshot snapshot, @Nullable String previousChildName) {
-                handsLeft = snapshot.getValue(Integer.class);
-            }
-
-            @Override
-            public void onChildRemoved(@NonNull DataSnapshot snapshot) {
-            }
-
-            @Override
-            public void onChildMoved(@NonNull DataSnapshot snapshot, @Nullable String previousChildName) {
-            }
-
-            @Override
-            public void onCancelled(@NonNull DatabaseError error) {
-            }
-        };
-    }
-
     ////////////////////////////////////////////////////////////////////////////////////////////
-    // setup
+                                            // setup
 
 
     // metoda care seteaza cate un listener pe fiecare buton de bid
@@ -208,13 +187,26 @@ public class GameTab extends Fragment {
 
                     // setam valoarea "Current" in baza de date pentru persoana urmatoare
                     // daca toata lumea a pariat, setam bid = true pentru a trece la partea de dat carti
-                    if (myIndex < playerCount) {
-                        bidReference.child("Player" + (myIndex + 1)).setValue("Current");
 
-                    } else if (myIndex == playerCount) {
+                    // TODO: Testare cu firstPlayerIndex diferit de zero
+                    if(myIndex == lastPlayerIndex) {
                         // aici: se executa codul de dupa partea de bid
                         turnReference.child("BidFinished").child("IsFinished").setValue("True");
+                    } else {
+                        if(myIndex < playerCount) {
+                            bidReference.child("Player" + (myIndex + 1)).setValue("Current");
+                        } else {
+                            bidReference.child("Player1").setValue("Current");
+                        }
                     }
+
+//                    if (myIndex < playerCount) {
+//                        bidReference.child("Player" + (myIndex + 1)).setValue("Current");
+//
+//                    } else if (myIndex == playerCount) {
+//                        // aici: se executa codul de dupa partea de bid
+//                        turnReference.child("BidFinished").child("IsFinished").setValue("True");
+//                    }
                 }
             });
         }
@@ -355,6 +347,8 @@ public class GameTab extends Fragment {
                 String key = snapshot.getKey();
                 String result = snapshot.getValue(String.class);
 
+                // jucatorul curent trebuie sa faca bid
+                // adaugam pe ecran partea de bid, intrebam utilizatorul cate maini ia
                 if (key.equals("Player" + (myIndex)) && result.equals("Current")) {
 
                     // setam vizibilitatea layout-ului din mijloc pe true
@@ -375,9 +369,7 @@ public class GameTab extends Fragment {
                 String result = snapshot.getValue().toString();
 
                 // jucatorul curent trebuie sa faca bid
-                // adaugam pe ecran partea de bid, intrebam utilizatorul cate maini ia, trimitem rezultatul
-                // la server, ascundem partea de bid, setam pt
-                // urmatorul player Current (daca nu suntem ultimii)
+                // adaugam pe ecran partea de bid, intrebam utilizatorul cate maini ia
                 if (key.equals("Player" + (myIndex)) && result.equals("Current")) {
 
                     // setam vizibilitatea layout-ului din mijloc pe true
@@ -556,6 +548,33 @@ public class GameTab extends Fragment {
         };
     }
 
+    // listener pentru setarea variabilei handsLeft
+    private ChildEventListener handsLeftChanged() {
+        return new ChildEventListener() {
+            @Override
+            public void onChildAdded(@NonNull DataSnapshot snapshot, @Nullable String previousChildName) {
+                handsLeft = snapshot.getValue(Integer.class);
+            }
+
+            @Override
+            public void onChildChanged(@NonNull DataSnapshot snapshot, @Nullable String previousChildName) {
+                handsLeft = snapshot.getValue(Integer.class);
+            }
+
+            @Override
+            public void onChildRemoved(@NonNull DataSnapshot snapshot) {
+            }
+
+            @Override
+            public void onChildMoved(@NonNull DataSnapshot snapshot, @Nullable String previousChildName) {
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+            }
+        };
+    }
+
 
     ////////////////////////////////////////////////////////////////////////////////////////////////
     // Alte metode
@@ -623,15 +642,29 @@ public class GameTab extends Fragment {
                 if (color.equals("null")) {
                     handsReference.child("Color").setValue(extractColor(cardName));
                 }
+
                 // cu exceptia cazului in care jucatorul este ultimul, se seteaza "Current" pe intrarea
                 // urmatorului jucator pentru a-l anunta ca el trebuie sa dea carte
-                // daca player-ul este ultimul (TODO - trebuie schimbat - daca playerul este ultimul care trebuie sa dea)
-                // actualizam handsLeft
-                if (myIndex != playerCount) {
-                    handsReference.child("Player" + (myIndex + 1)).setValue("Current");
-                } else {
+                // daca player-ul este ultimul, actualizam handsLeft
+
+
+                // TODO: Testare cu firstPlayerIndex diferit de zero
+                if(myIndex == lastPlayerIndex) {
                     handsLeftReference.child("HandsLeft").setValue(handsLeft - 1);
+                } else {
+                    if(myIndex == playerCount) {
+                        handsReference.child("Player1").setValue("Current");
+                    } else {
+                        handsReference.child("Player" + (myIndex + 1)).setValue("Current");
+                    }
                 }
+
+//                if (myIndex != playerCount) {
+//                    handsReference.child("Player" + (myIndex + 1)).setValue("Current");
+//                } else {
+//                    handsLeftReference.child("HandsLeft").setValue(handsLeft - 1);
+//                }
+
                 // se elimina metodele de onClick de pe imagini
                 for (int i = 0; i < 8; i++) {
                     int resId = mContext.getResources().getIdentifier(
@@ -655,4 +688,13 @@ public class GameTab extends Fragment {
         int index = cardName.indexOf('_');
         return cardName.substring(0, index);
     }
+
+    // functie care intoarce lastPlayerIndex
+    private int setLastPlayerIndex(int firstPlayerIndex) {
+        if(firstPlayerIndex + 1 == playerCount) {
+            return firstPlayerIndex - 1;
+        }
+        return playerCount - 1;
+    }
+
 }
