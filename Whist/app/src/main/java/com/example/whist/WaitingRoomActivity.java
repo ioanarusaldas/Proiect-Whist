@@ -3,15 +3,12 @@ package com.example.whist;
 import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.KeyEvent;
 import android.view.View;
 import android.view.inputmethod.InputMethodManager;
-import android.widget.AbsListView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
-import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -32,7 +29,6 @@ import java.util.HashMap;
 public class WaitingRoomActivity extends AppCompatActivity {
 
     private EditText mInput;
-    private ListView mPlayerNameList;
     private DatabaseReference mPlayerReference;
     private DatabaseReference mStatusReference;
     private TextView mConnectedPlayersView;
@@ -51,7 +47,7 @@ public class WaitingRoomActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_waiting_room);
 
-        mPlayerNameList = findViewById(R.id.player_name_list);
+        ListView mPlayerNameList = findViewById(R.id.player_name_list);
 
         // Create an ArrayAdapter from List
         final ArrayAdapter<String> arrayAdapter = new ArrayAdapter<>

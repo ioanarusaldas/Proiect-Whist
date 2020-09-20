@@ -5,13 +5,10 @@
 (GameTab -> ScoreTab)
 
 
-
 ===============================================================================
 
 TODO:
 
-- Design frumos la MainActivity + WaitingRoomActivity (sa facem cumva sa nu
-mai iasa lista cu jucatori din ecran)
 - Design frumos la ScoreTab + Tabelul cu scorul
 - Continuam functia turn cu dat-ul cartilor
 
@@ -88,7 +85,6 @@ face un Log la cartile primite
 10.09 - Sergiu + Rusalda
 - fixat bug-uri la conectarea jucatorilor
 
-
 11.09 - Sergiu
 - adaugat flow-ul de bid al playerilor 
 (ultimele modificari trebuie testate pe mai multe device-uri)!
@@ -127,41 +123,43 @@ muta in centru si dispare din "mana"
 actualizeaza UI-ul cu cartile corespunzatoare (pentru o singura mana,
  momentan)
 
-
-===============================================================================
-
-
-Flow pt dat carti:
-
-BidFinished = True -> 
-- afisam bid-urile
-- introducem intrarea Hands avand - intrarea Hand1, Hand2 ... Hand8
-
-Hand1 va avea:
-StartingPlayer - cu numele/indicele jucatorului care da prima carte
-(la acest jucator se vor seta metode de onClick pe carti care vor muta cartea in
-partea de centru a ecranului si va trimite la server valoarea resursei cartii date),
-modificand valoarea "Pending" in valoare "Current" pentru urmatorul jucator
-
-Player1, Player2 ... PlayerN - care vor avea initial Pending, jucatorul curent va avea
-Current, iar cand valoarea din Current se va modifica intr-o valoare numerica
-reprezentand valoarea resursei imaginii cartii pe care a dat-o, fiecare player va seta
-cartea corespunzatoare in dreptul jucatorului care a dat-o.
+18.09 - Sergiu + Rusalda
+- Adaugat intrari de HandsLeft si Color in baza de date + setare listeneri pe
+aceste intrari
+- Adaugare reguli de setare onClick in functie de culoarea cartii date jos
 
 
 ===============================================================================
 
-- cand incepe mana, se seteaza color = null (cand se termina partea de bid)
-- fiecare player seteaza listener pe color si retine in cod valoarea ei la fiecare
-modificare
+TODO:
 
-- daca color == null, in functie de cartea data de mine, voi seta in baza de date
-culoarea si voi putea da orice carte
+1.
+	- In turn, modificam orice iteratie de la 0 la playersCount sa fie de la
+currentPlayerIndex la playersCount, apoi de la 0 la currentPlayerIndex - 1
+	- "Sfarsitul" mainii nu va mai fi semnalat de actiunea jucatorului de pe
+pozitia playersCount - 1, ci de pe o alta variabila (lastPlayerIndex)
+(Trebuie modificati listenerii)
+	- lastPlayer index va fi:
+					playerCount - 1, daca currentPlayerIndex este 0
+					currentPlayerIndex, alftel
 
-- daca color e diferit de null, pot da doar cartile care egale cu color (daca am)
-daca nu, pot da orice carte
+Astfel, jocul va functiona normal indiferent de jucatorul care incepe, se poate
+testa manual apeland metoda turn cu alta valoare pentru currentPlayerIndex
 
+2. 
+	- Facem un tabel in scoreTab cu 2 linii si maxim 6 coloane (sau invers)
+	- Fiecare element din tabel va fi un textview
+	- Primele 6 elemente reprezinta numele jucatorilor
+	- Ultimele 6 reprezinta valoarea scorului lor
+	- In GameActivity la creare, trimitem la ScoreTab array-ul cu players asa
+cum l-am trimis si in GameTab
+	- In functie de dimensiunea lui players, ascundem ultimele 6 - (players.size())
+coloane
+	- Setam numele jucatorilor pe prima linie si scorul 0 la a doua
 
-
+In GameTab:
+	- Atunci cand un turn se termina, se calculeaza scorul si se trimite la
+ScoreTab un ArrayList cu scorurile din turn-ul respectiv. ScoreTab actualizeaza
+TextView-urile cu noile scoruri
 
 
