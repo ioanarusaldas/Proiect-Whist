@@ -2,6 +2,7 @@ package com.example.whist;
 
 import android.content.Context;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -11,6 +12,7 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
+import androidx.annotation.IntRange;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
@@ -23,6 +25,7 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.GenericTypeIndicator;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -43,6 +46,9 @@ public class GameTab extends Fragment {
 
     // lista bid-urilor
     private final ArrayList<Integer> bids = new ArrayList<>();
+    private final ArrayList<Integer> cards = new ArrayList<>();
+
+    private final ArrayList<Integer> points = new ArrayList<>();
 
     private View rootView;
     private Context mContext;
@@ -106,14 +112,21 @@ public class GameTab extends Fragment {
 
     private void runGame() {
         // (Momentan) se realizeaza un joc de 8
-        turn(0, 8);
-
+        turn(2 , 8);
     }
-
 
     public void turn(final int firstPlayerIndex, int gameType) {
 
+        // initializare lastPlayerIndex
         lastPlayerIndex = setLastPlayerIndex(firstPlayerIndex);
+
+        // initializare points si cards
+        pointsInit();
+        cardsInit();
+
+
+        Log.d("bug", new Integer(lastPlayerIndex).toString() + " " + new Integer(firstPlayerIndex).toString());
+
 
         // Cod executat doar de jucatorul care este la rand sa faca bid
         if (firstPlayerIndex + 1 == myIndex) {
@@ -156,10 +169,25 @@ public class GameTab extends Fragment {
         bidReference.addChildEventListener(bidListener());
         handsReference.addChildEventListener(colorChanged());
         handsLeftReference.addChildEventListener(handsLeftChanged());
+
     }
 
     ////////////////////////////////////////////////////////////////////////////////////////////
                                             // setup
+
+    // initializare arraylist points
+    private void pointsInit() {
+        for(int i = 0; i < playerCount; i++) {
+            points.add(0);
+        }
+    }
+
+    private void cardsInit() {
+        for(int i = 0; i < playerCount; i++) {
+            cards.add(-1);
+        }
+    }
+
 
 
     // metoda care seteaza cate un listener pe fiecare buton de bid
@@ -189,7 +217,7 @@ public class GameTab extends Fragment {
                     // daca toata lumea a pariat, setam bid = true pentru a trece la partea de dat carti
 
                     // TODO: Testare cu firstPlayerIndex diferit de zero
-                    if(myIndex == lastPlayerIndex) {
+                    if(myIndex - 1 == lastPlayerIndex) {
                         // aici: se executa codul de dupa partea de bid
                         turnReference.child("BidFinished").child("IsFinished").setValue("True");
                     } else {
@@ -275,7 +303,7 @@ public class GameTab extends Fragment {
 
         int index = 0;
         // setare bid pt adversari
-        for (int i = 0; i < players.size(); i++) {
+        for (int i = 0; i < playerCount; i++) {
             if ((i + 1) != myIndex) {
                 bidTextViews.get(index).setVisibility(View.VISIBLE);
                 bidTextViews.get(index++).setText("Bid: " + bids.get(i));
@@ -472,6 +500,9 @@ public class GameTab extends Fragment {
                     // extragem indicele
                     int playerIndex = Character.getNumericValue(key.charAt(key.length() - 1));
 
+
+                    addCardValue(value, playerIndex - 1);
+
                     // ajustam indicele (pentru a pune cartea in slot-ul corect)
                     if (playerIndex > myIndex) {
                         playerIndex--;
@@ -496,6 +527,8 @@ public class GameTab extends Fragment {
                     card.setImageResource(drawableId);
                     card.setVisibility(View.VISIBLE);
                     card.setContentDescription(value);
+
+                    Log.d("testAddCard", cards.toString());
                 }
             }
 
@@ -559,6 +592,13 @@ public class GameTab extends Fragment {
             @Override
             public void onChildChanged(@NonNull DataSnapshot snapshot, @Nullable String previousChildName) {
                 handsLeft = snapshot.getValue(Integer.class);
+
+                int maxCard = Collections.max(cards);
+                int maxCardIndex = cards.indexOf(maxCard);
+
+                points.set(maxCardIndex, points.get(maxCardIndex) + 1);
+
+                Log.d("points", points.toString());
             }
 
             @Override
@@ -634,22 +674,25 @@ public class GameTab extends Fragment {
                 // extragere nume carte din descrierea ei
                 String cardName = imageView.getContentDescription().toString();
 
+                // trimitere culoare la server
+                if (color.equals("null")) {
+                    String newColor = extractColor(cardName);
+
+                    handsReference.child("Color").setValue(newColor);
+                    color = newColor;
+                }
+
                 // se trimite la baza de date numele cartii care a fost data
                 handsReference.child("Player" + myIndex).setValue(cardName);
                 // se sterge descrierea de pe carte
                 imageView.setContentDescription(null);
-
-                if (color.equals("null")) {
-                    handsReference.child("Color").setValue(extractColor(cardName));
-                }
 
                 // cu exceptia cazului in care jucatorul este ultimul, se seteaza "Current" pe intrarea
                 // urmatorului jucator pentru a-l anunta ca el trebuie sa dea carte
                 // daca player-ul este ultimul, actualizam handsLeft
 
 
-                // TODO: Testare cu firstPlayerIndex diferit de zero
-                if(myIndex == lastPlayerIndex) {
+                if(myIndex - 1 == lastPlayerIndex) {
                     handsLeftReference.child("HandsLeft").setValue(handsLeft - 1);
                 } else {
                     if(myIndex == playerCount) {
@@ -658,12 +701,6 @@ public class GameTab extends Fragment {
                         handsReference.child("Player" + (myIndex + 1)).setValue("Current");
                     }
                 }
-
-//                if (myIndex != playerCount) {
-//                    handsReference.child("Player" + (myIndex + 1)).setValue("Current");
-//                } else {
-//                    handsLeftReference.child("HandsLeft").setValue(handsLeft - 1);
-//                }
 
                 // se elimina metodele de onClick de pe imagini
                 for (int i = 0; i < 8; i++) {
@@ -679,8 +716,21 @@ public class GameTab extends Fragment {
                 ImageView newImg = rootView.findViewById(R.id.my_card_slot);
                 newImg.setVisibility(View.VISIBLE);
                 newImg.setImageDrawable(imageView.getDrawable());
+
+                addCardValue(cardName, myIndex - 1);
+
+                Log.d("testAddCard", cards.toString());
+
             }
         };
+    }
+
+    private void addCardValue(String cardName, int index) {
+        String cardColor = extractColor(cardName);
+
+        if(cardColor.equals(color)) {
+            cards.set(index, extractValue(cardName));
+        }
     }
 
     // metoda care extrage un string cu culoarea unei carti
@@ -689,12 +739,31 @@ public class GameTab extends Fragment {
         return cardName.substring(0, index);
     }
 
+    private int extractValue(String cardName) {
+        int index = cardName.indexOf('_');
+        String value = cardName.substring(index + 1, cardName.length());
+
+        switch (value){
+            case "a":
+                return 15;
+            case "j":
+                return 12;
+            case "q":
+                return 13;
+            case "k":
+                return 14;
+            default:
+                return Integer.parseInt(value);
+        }
+    }
+
     // functie care intoarce lastPlayerIndex
     private int setLastPlayerIndex(int firstPlayerIndex) {
-        if(firstPlayerIndex + 1 == playerCount) {
-            return firstPlayerIndex - 1;
+        Log.d("test2", new Integer(firstPlayerIndex).toString() + " " + new Integer(playerCount).toString());
+        if(firstPlayerIndex == 0) {
+            return playerCount - 1;
         }
-        return playerCount - 1;
+        return firstPlayerIndex - 1;
     }
 
 }
