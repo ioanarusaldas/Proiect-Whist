@@ -1,57 +1,39 @@
 package com.example.whist;
 
+import android.content.Context;
 import android.os.Bundle;
 
+import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
 
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.TextView;
 
-/**
- * A simple {@link Fragment} subclass.
- * Use the {@link ScoreTab#newInstance} factory method to
- * create an instance of this fragment.
- */
+import java.util.ArrayList;
+
 public class ScoreTab extends Fragment {
 
-    // TODO: Rename parameter arguments, choose names that match
-    // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
-    private static final String ARG_PARAM1 = "param1";
-    private static final String ARG_PARAM2 = "param2";
+    private ArrayList<String> players;
+    private static final String ARG_PARAM1 = "players";
 
-    // TODO: Rename and change types of parameters
-    private String mParam1;
-    private String mParam2;
+    private Context mContext;
+    private View fragmentView;
 
-    public ScoreTab() {
-        // Required empty public constructor
-    }
+    public ScoreTab() {}
 
-    /**
-     * Use this factory method to create a new instance of
-     * this fragment using the provided parameters.
-     *
-     * @param param1 Parameter 1.
-     * @param param2 Parameter 2.
-     * @return A new instance of fragment ScoreTab.
-     */
-    // TODO: Rename and change types and number of parameters
-    public static ScoreTab newInstance(String param1, String param2) {
-        ScoreTab fragment = new ScoreTab();
-        Bundle args = new Bundle();
-        args.putString(ARG_PARAM1, param1);
-        args.putString(ARG_PARAM2, param2);
-        fragment.setArguments(args);
-        return fragment;
+    @Override
+    public void onAttach(@NonNull Context context) {
+        super.onAttach(context);
+        mContext = context;
     }
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         if (getArguments() != null) {
-            mParam1 = getArguments().getString(ARG_PARAM1);
-            mParam2 = getArguments().getString(ARG_PARAM2);
+            players = getArguments().getStringArrayList(ARG_PARAM1);
         }
     }
 
@@ -59,6 +41,50 @@ public class ScoreTab extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.fragment_score_tab, container, false);
+        fragmentView = inflater.inflate(R.layout.fragment_score_tab, container, false);
+        return fragmentView;
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+
+        setTable();
+    }
+
+
+    // metoda care seteaza tabelul de scor
+    private void setTable() {
+        ArrayList<TextView> nameTextViews = new ArrayList<>();
+        nameTextViews.add((TextView) fragmentView.findViewById(R.id.score_player_name_1));
+        nameTextViews.add((TextView) fragmentView.findViewById(R.id.score_player_name_2));
+        nameTextViews.add((TextView) fragmentView.findViewById(R.id.score_player_name_3));
+        nameTextViews.add((TextView) fragmentView.findViewById(R.id.score_player_name_4));
+        nameTextViews.add((TextView) fragmentView.findViewById(R.id.score_player_name_5));
+        nameTextViews.add((TextView) fragmentView.findViewById(R.id.score_player_name_6));
+
+        ArrayList<TextView> scoreTextViews = new ArrayList<>();
+        scoreTextViews.add((TextView) fragmentView.findViewById(R.id.score_player_1));
+        scoreTextViews.add((TextView) fragmentView.findViewById(R.id.score_player_2));
+        scoreTextViews.add((TextView) fragmentView.findViewById(R.id.score_player_3));
+        scoreTextViews.add((TextView) fragmentView.findViewById(R.id.score_player_4));
+        scoreTextViews.add((TextView) fragmentView.findViewById(R.id.score_player_5));
+        scoreTextViews.add((TextView) fragmentView.findViewById(R.id.score_player_6));
+
+
+
+        for(int i = 5; i >= players.size(); i--) {
+            nameTextViews.get(i).setVisibility(View.GONE);
+            scoreTextViews.get(i).setVisibility(View.GONE);
+
+            nameTextViews.remove(i);
+            scoreTextViews.remove(i);
+        }
+
+        for(int i = 0; i < players.size(); i++) {
+            nameTextViews.get(i).setText(players.get(i));
+        }
+
+
     }
 }

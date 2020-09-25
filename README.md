@@ -1,9 +1,5 @@
 # Proiect-Whist
 
-- Cum transmitem informatii de la un tab la altul?
-
-(GameTab -> ScoreTab)
-
 
 ===============================================================================
 
@@ -163,6 +159,14 @@ aceste intrari
 20.09 - Sergiu
 - (netestat) - bid-urile si dat-ul de carti nu se mai face strict incepand
 de la primul jucator
+
+24.09 - Toata lumea
+- oricine poate incepe jocul, nu doar strict primul jucator conectat
+- calculare castigator mana
+
+25.09 - Toata lumea
+- implementare scoreTab
+- setare nume al jucatorilor in tabel
 
 
 ===============================================================================

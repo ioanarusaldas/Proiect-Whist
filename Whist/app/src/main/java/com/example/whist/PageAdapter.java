@@ -25,16 +25,20 @@ public class PageAdapter extends FragmentPagerAdapter {
     @NonNull
     @Override
     public Fragment getItem(int position) {
+
+        Bundle b = new Bundle();
+        b.putStringArrayList("players", players);
+        b.putInt("myIndex", myIndex);
+
         switch (position) {
             case 0:
-                GameTab tab = new GameTab();
-                Bundle b = new Bundle();
-                b.putStringArrayList("players", players);
-                b.putInt("myIndex", myIndex);
-                tab.setArguments(b);
-                return tab;
+                GameTab gameTab = new GameTab();
+                gameTab.setArguments(b);
+                return gameTab;
             case 1:
-                return new ScoreTab();
+                ScoreTab scoreTab = new ScoreTab();
+                scoreTab.setArguments(b);
+                return scoreTab;
 
             default:
                 return null;

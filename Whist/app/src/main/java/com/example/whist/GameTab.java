@@ -12,7 +12,6 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
-import androidx.annotation.IntRange;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
@@ -38,19 +37,22 @@ public class GameTab extends Fragment {
     private String color;
     private int handsLeft;
 
+    // referinte baza de date
     private DatabaseReference turnReference;
     private DatabaseReference bidReference;
     private DatabaseReference handsReference;
     private DatabaseReference handsLeftReference;
-    private DatabaseReference scoreReference;
+    private DatabaseReference handsWonReference;
 
-    // lista bid-urilor
+    // lista bid-urilor, cartilor date si a mainilor castigate
     private final ArrayList<Integer> bids = new ArrayList<>();
     private final ArrayList<Integer> cards = new ArrayList<>();
 
-    private final ArrayList<Integer> points = new ArrayList<>();
+    private final ArrayList<Integer> handsWon = new ArrayList<>();
 
-    private View rootView;
+    // view-ul tab-ului
+    private View fragmentView;
+    // contextul
     private Context mContext;
 
 
@@ -82,7 +84,7 @@ public class GameTab extends Fragment {
         // creare intrare "Hands" pentru a gestiona jocurile, handsLeft pentru maini ramase, Score pentru a gestiona scorul (maini luate
         handsReference = turnReference.child("Hands");
         handsLeftReference = turnReference.child("HandsLeft");
-        scoreReference = turnReference.child("Score");
+        handsWonReference = turnReference.child("HandsWon");
 
     }
 
@@ -90,29 +92,33 @@ public class GameTab extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
-        rootView = inflater.inflate(R.layout.fragment_game_tab, container, false);
+        fragmentView = inflater.inflate(R.layout.fragment_game_tab, container, false);
+        return fragmentView;
+    }
 
+    @Override
+    public void onResume() {
+        super.onResume();
 
         // setare nume playeri
-        setPlayerNames(rootView);
+        setPlayerNames(fragmentView);
 
         // ascundere avatari nefolositori
-        hidePlayerAvatars(rootView);
+        hidePlayerAvatars(fragmentView);
 
         // setare listeneri pe butoanele de bid
         setButtonListeners();
 
+        // setare listener pe intrarea BidFinished
         setBidFinishedListener();
 
         // metoda prin care se ruleaza jocul
         runGame();
-
-        return rootView;
     }
 
     private void runGame() {
         // (Momentan) se realizeaza un joc de 8
-        turn(2 , 8);
+        turn(0, 8);
     }
 
     public void turn(final int firstPlayerIndex, int gameType) {
@@ -120,13 +126,9 @@ public class GameTab extends Fragment {
         // initializare lastPlayerIndex
         lastPlayerIndex = setLastPlayerIndex(firstPlayerIndex);
 
-        // initializare points si cards
-        pointsInit();
+        // initializare handsWon si cards
+        handsWonInit();
         cardsInit();
-
-
-        Log.d("bug", new Integer(lastPlayerIndex).toString() + " " + new Integer(firstPlayerIndex).toString());
-
 
         // Cod executat doar de jucatorul care este la rand sa faca bid
         if (firstPlayerIndex + 1 == myIndex) {
@@ -148,7 +150,7 @@ public class GameTab extends Fragment {
                     bidReference.child("Player" + (i + 1)).setValue("Pending");
                     handsReference.child("Player" + (i + 1)).setValue("Pending");
                 }
-                scoreReference.child("Player" + (i + 1)).setValue(0);
+                handsWonReference.child("Player" + (i + 1)).setValue(0);
             }
 
             // setam pe intrarea jucatorului curent faptul ca el este cel care trebuie sa aleaga
@@ -173,28 +175,28 @@ public class GameTab extends Fragment {
     }
 
     ////////////////////////////////////////////////////////////////////////////////////////////
-                                            // setup
+    // setup
 
-    // initializare arraylist points
-    private void pointsInit() {
-        for(int i = 0; i < playerCount; i++) {
-            points.add(0);
+    // initializare arraylist handsWon
+    private void handsWonInit() {
+        for (int i = 0; i < playerCount; i++) {
+            handsWon.add(0);
         }
     }
 
+    // initializare puncte card
     private void cardsInit() {
-        for(int i = 0; i < playerCount; i++) {
+        for (int i = 0; i < playerCount; i++) {
             cards.add(-1);
         }
     }
 
 
-
     // metoda care seteaza cate un listener pe fiecare buton de bid
     private void setButtonListeners() {
 
-        GridLayout buttonsGrid = rootView.findViewById(R.id.buttons_grid);
-        final LinearLayout bidLayout = rootView.findViewById(R.id.bid_layout);
+        GridLayout buttonsGrid = fragmentView.findViewById(R.id.buttons_grid);
+        final LinearLayout bidLayout = fragmentView.findViewById(R.id.bid_layout);
         int buttonsCount = buttonsGrid.getChildCount();
 
         for (int i = 0; i < buttonsCount; i++) {
@@ -215,26 +217,17 @@ public class GameTab extends Fragment {
 
                     // setam valoarea "Current" in baza de date pentru persoana urmatoare
                     // daca toata lumea a pariat, setam bid = true pentru a trece la partea de dat carti
-
-                    // TODO: Testare cu firstPlayerIndex diferit de zero
-                    if(myIndex - 1 == lastPlayerIndex) {
+                    if (myIndex - 1 == lastPlayerIndex) {
                         // aici: se executa codul de dupa partea de bid
                         turnReference.child("BidFinished").child("IsFinished").setValue("True");
                     } else {
-                        if(myIndex < playerCount) {
+                        if (myIndex < playerCount) {
                             bidReference.child("Player" + (myIndex + 1)).setValue("Current");
                         } else {
                             bidReference.child("Player1").setValue("Current");
                         }
                     }
 
-//                    if (myIndex < playerCount) {
-//                        bidReference.child("Player" + (myIndex + 1)).setValue("Current");
-//
-//                    } else if (myIndex == playerCount) {
-//                        // aici: se executa codul de dupa partea de bid
-//                        turnReference.child("BidFinished").child("IsFinished").setValue("True");
-//                    }
                 }
             });
         }
@@ -290,14 +283,14 @@ public class GameTab extends Fragment {
     private void setBidTextViews() {
         // ArrayList cu textView-urile in care se pun bid-urile
         ArrayList<TextView> bidTextViews = new ArrayList<>(5);
-        bidTextViews.add((TextView) rootView.findViewById(R.id.player1_bid));
-        bidTextViews.add((TextView) rootView.findViewById(R.id.player2_bid));
-        bidTextViews.add((TextView) rootView.findViewById(R.id.player3_bid));
-        bidTextViews.add((TextView) rootView.findViewById(R.id.player4_bid));
-        bidTextViews.add((TextView) rootView.findViewById(R.id.player5_bid));
+        bidTextViews.add((TextView) fragmentView.findViewById(R.id.player1_bid));
+        bidTextViews.add((TextView) fragmentView.findViewById(R.id.player2_bid));
+        bidTextViews.add((TextView) fragmentView.findViewById(R.id.player3_bid));
+        bidTextViews.add((TextView) fragmentView.findViewById(R.id.player4_bid));
+        bidTextViews.add((TextView) fragmentView.findViewById(R.id.player5_bid));
 
         // textview-ul in care se pune bid-ul jucatorului curent
-        TextView myBidTextView = rootView.findViewById(R.id.my_bid_text_view);
+        TextView myBidTextView = fragmentView.findViewById(R.id.my_bid_text_view);
         myBidTextView.setVisibility(View.VISIBLE);
         myBidTextView.setText("Bid: " + bids.get(myIndex - 1));
 
@@ -341,7 +334,7 @@ public class GameTab extends Fragment {
                             mContext.getPackageName()
                     );
 
-                    ImageView card = rootView.findViewById(resId);
+                    ImageView card = fragmentView.findViewById(resId);
                     // setare resursa pe slot
                     card.setImageResource(drawableId);
                     card.setContentDescription(myCards.get(i));
@@ -377,10 +370,10 @@ public class GameTab extends Fragment {
 
                 // jucatorul curent trebuie sa faca bid
                 // adaugam pe ecran partea de bid, intrebam utilizatorul cate maini ia
-                if (key.equals("Player" + (myIndex)) && result.equals("Current")) {
+                if (key.equals("Player" + myIndex) && result.equals("Current")) {
 
                     // setam vizibilitatea layout-ului din mijloc pe true
-                    LinearLayout bidLayout = rootView.findViewById(R.id.bid_layout);
+                    LinearLayout bidLayout = fragmentView.findViewById(R.id.bid_layout);
                     bidLayout.setVisibility(View.VISIBLE);
 
                 } else {
@@ -398,10 +391,10 @@ public class GameTab extends Fragment {
 
                 // jucatorul curent trebuie sa faca bid
                 // adaugam pe ecran partea de bid, intrebam utilizatorul cate maini ia
-                if (key.equals("Player" + (myIndex)) && result.equals("Current")) {
+                if (key.equals("Player" + myIndex) && result.equals("Current")) {
 
                     // setam vizibilitatea layout-ului din mijloc pe true
-                    LinearLayout bidLayout = rootView.findViewById(R.id.bid_layout);
+                    LinearLayout bidLayout = fragmentView.findViewById(R.id.bid_layout);
                     bidLayout.setVisibility(View.VISIBLE);
 
                 } else {
@@ -474,10 +467,11 @@ public class GameTab extends Fragment {
         return new ChildEventListener() {
             @Override
             public void onChildAdded(@NonNull DataSnapshot snapshot, @Nullable String previousChildName) {
-                // setare onClick pe carti atunci cand este randul jucatorului curent
+
                 String key = snapshot.getKey();
                 String value = snapshot.getValue(String.class);
 
+                // setare onClick pe carti atunci cand este randul jucatorului curent
                 if (key.equals("Player" + myIndex) && value.equals("Current")) {
                     setCardOnClick();
                 }
@@ -486,10 +480,11 @@ public class GameTab extends Fragment {
 
             @Override
             public void onChildChanged(@NonNull DataSnapshot snapshot, @Nullable String previousChildName) {
-                // setare onClick pe carti atunci cand este randul jucatorului curent
+
                 String key = snapshot.getKey();
                 String value = snapshot.getValue(String.class);
 
+                // setare onClick pe carti atunci cand este randul jucatorului curent
                 if (key.equals("Player" + myIndex) && value.equals("Current")) {
                     setCardOnClick();
                 }
@@ -500,7 +495,7 @@ public class GameTab extends Fragment {
                     // extragem indicele
                     int playerIndex = Character.getNumericValue(key.charAt(key.length() - 1));
 
-
+                    // adaugare valoare carte
                     addCardValue(value, playerIndex - 1);
 
                     // ajustam indicele (pentru a pune cartea in slot-ul corect)
@@ -522,7 +517,7 @@ public class GameTab extends Fragment {
                             mContext.getPackageName()
                     );
 
-                    ImageView card = rootView.findViewById(resId);
+                    ImageView card = fragmentView.findViewById(resId);
                     // setare resursa pe slot
                     card.setImageResource(drawableId);
                     card.setVisibility(View.VISIBLE);
@@ -593,12 +588,26 @@ public class GameTab extends Fragment {
             public void onChildChanged(@NonNull DataSnapshot snapshot, @Nullable String previousChildName) {
                 handsLeft = snapshot.getValue(Integer.class);
 
+                // extragere maxim punctaje carti
                 int maxCard = Collections.max(cards);
+                // extragere index pentru jucatorul care a castigat mana
                 int maxCardIndex = cards.indexOf(maxCard);
 
-                points.set(maxCardIndex, points.get(maxCardIndex) + 1);
+                // setare castigator mana
+                handsWon.set(maxCardIndex, handsWon.get(maxCardIndex) + 1);
 
-                Log.d("points", points.toString());
+                // DEBUG ONLY: logare handsWon
+                Log.d("handsWon", handsWon.toString());
+
+                /* TODO: Daca handsLeft > 0, setam color pe null, setam Current si Pending pe jucatori
+                 *   in functie de maxCardIndex (jucatorul castigator), eliminam cartile din slot-uri
+                 *   (eventual folosind o animatie si actualizand in dreptul fiecarui jucator cate
+                 *   maini a luat)
+                 * */
+
+                /* TODO: daca handsLeft e 0, calculam punctajele si le trimitem la ScoreTab prin
+                 *   intermediul unui Singleton, si modificam o valoare din baza de date care sa
+                 *   declanseze inceputul altui joc de 8 */
             }
 
             @Override
@@ -633,7 +642,7 @@ public class GameTab extends Fragment {
 
             // setare listener pe carte
             // se verifica daca s-a gasit vreo carte de aceeasi culoare cu cea care este deja data
-            ImageView img = rootView.findViewById(resId);
+            ImageView img = fragmentView.findViewById(resId);
             String cardColor = extractColor(img.getContentDescription().toString());
             if (!(color.equals("null")) && (cardColor.equals(color))) {
                 img.setOnClickListener(cardOnClickListener());
@@ -655,7 +664,7 @@ public class GameTab extends Fragment {
                 );
 
                 // setare listener pe carte
-                ImageView img = rootView.findViewById(resId);
+                ImageView img = fragmentView.findViewById(resId);
                 img.setOnClickListener(cardOnClickListener());
             }
         }
@@ -690,12 +699,10 @@ public class GameTab extends Fragment {
                 // cu exceptia cazului in care jucatorul este ultimul, se seteaza "Current" pe intrarea
                 // urmatorului jucator pentru a-l anunta ca el trebuie sa dea carte
                 // daca player-ul este ultimul, actualizam handsLeft
-
-
-                if(myIndex - 1 == lastPlayerIndex) {
+                if (myIndex - 1 == lastPlayerIndex) {
                     handsLeftReference.child("HandsLeft").setValue(handsLeft - 1);
                 } else {
-                    if(myIndex == playerCount) {
+                    if (myIndex == playerCount) {
                         handsReference.child("Player1").setValue("Current");
                     } else {
                         handsReference.child("Player" + (myIndex + 1)).setValue("Current");
@@ -709,26 +716,25 @@ public class GameTab extends Fragment {
                             "id",
                             mContext.getPackageName()
                     );
-                    ImageView img = rootView.findViewById(resId);
+                    ImageView img = fragmentView.findViewById(resId);
                     img.setOnClickListener(null);
                 }
                 // setare imagine cu cartea data pe slotul jucatorului curent
-                ImageView newImg = rootView.findViewById(R.id.my_card_slot);
+                ImageView newImg = fragmentView.findViewById(R.id.my_card_slot);
                 newImg.setVisibility(View.VISIBLE);
                 newImg.setImageDrawable(imageView.getDrawable());
 
+                // setare punctaj pentru jucatorul curent
                 addCardValue(cardName, myIndex - 1);
-
-                Log.d("testAddCard", cards.toString());
-
             }
         };
     }
 
+    // Metoda care determina punctajul unei carti date in functie de culoarea de jos
     private void addCardValue(String cardName, int index) {
         String cardColor = extractColor(cardName);
 
-        if(cardColor.equals(color)) {
+        if (cardColor.equals(color)) {
             cards.set(index, extractValue(cardName));
         }
     }
@@ -739,11 +745,12 @@ public class GameTab extends Fragment {
         return cardName.substring(0, index);
     }
 
+    // metoda care extrage valoarea cartii date jos
     private int extractValue(String cardName) {
         int index = cardName.indexOf('_');
         String value = cardName.substring(index + 1, cardName.length());
 
-        switch (value){
+        switch (value) {
             case "a":
                 return 15;
             case "j":
@@ -759,8 +766,7 @@ public class GameTab extends Fragment {
 
     // functie care intoarce lastPlayerIndex
     private int setLastPlayerIndex(int firstPlayerIndex) {
-        Log.d("test2", new Integer(firstPlayerIndex).toString() + " " + new Integer(playerCount).toString());
-        if(firstPlayerIndex == 0) {
+        if (firstPlayerIndex == 0) {
             return playerCount - 1;
         }
         return firstPlayerIndex - 1;
