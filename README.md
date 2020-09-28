@@ -8,39 +8,6 @@ TODO:
 - Design frumos la ScoreTab + Tabelul cu scorul
 - Continuam functia turn cu dat-ul cartilor
 
-
-
-1.
-	- In turn, modificam orice iteratie de la 0 la playersCount sa fie de la
-currentPlayerIndex la playersCount, apoi de la 0 la currentPlayerIndex - 1
-	- "Sfarsitul" mainii nu va mai fi semnalat de actiunea jucatorului de pe
-pozitia playersCount - 1, ci de pe lastPlayerIndex
-(Trebuie modificati listenerii)
-	- lastPlayer index va fi:
-					playerCount - 1, daca currentPlayerIndex este 0
-					currentPlayerIndex, alftel
-
-Astfel, jocul va functiona normal indiferent de jucatorul care incepe, se poate
-testa manual apeland metoda turn cu alta valoare pentru currentPlayerIndex
-
-2. 
-	- Facem un tabel in scoreTab cu 2 linii si maxim 6 coloane (sau invers)
-	- Fiecare element din tabel va fi un textview
-	- Primele 6 elemente reprezinta numele jucatorilor
-	- Ultimele 6 reprezinta valoarea scorului lor
-	- In GameActivity la creare, trimitem la ScoreTab array-ul cu players asa
-cum l-am trimis si in GameTab
-	- In functie de dimensiunea lui players, ascundem ultimele 6 - (players.size())
-coloane
-	- Setam numele jucatorilor pe prima linie si scorul 0 la a doua
-
-In GameTab:
-	- Atunci cand un turn se termina, se calculeaza scorul si se trimite la
-ScoreTab un ArrayList cu scorurile din turn-ul respectiv. ScoreTab actualizeaza
-TextView-urile cu noile scoruri
-
-
-
 ===============================================================================
 
 04.09 - Sergiu

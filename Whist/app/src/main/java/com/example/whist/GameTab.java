@@ -490,7 +490,8 @@ public class GameTab extends Fragment {
                 }
 
                 // daca alt jucator a dat o carte, afisam cartea in dreptul sau
-                if (!key.equals("Player" + myIndex) && !value.equals("Current") && !key.equals("Color")) {
+                if (!key.equals("Player" + myIndex) && !value.equals("Current")
+                        && !key.equals("Color") && !value.equals("Pending")) {
 
                     // extragem indicele
                     int playerIndex = Character.getNumericValue(key.charAt(key.length() - 1));
@@ -599,8 +600,13 @@ public class GameTab extends Fragment {
                 // DEBUG ONLY: logare handsWon
                 Log.d("handsWon", handsWon.toString());
 
+                if (handsLeft > 0) {
+                    setNextHand(maxCardIndex);
+                }
+
                 /* TODO: Daca handsLeft > 0, setam color pe null, setam Current si Pending pe jucatori
-                 *   in functie de maxCardIndex (jucatorul castigator), eliminam cartile din slot-uri
+                 *   in functie de maxCardIndex (jucatorul castigator), eliminam cartile din slot-uri,
+                 *  setam lastPlayerIndex in functie de maxCardIndex
                  *   (eventual folosind o animatie si actualizand in dreptul fiecarui jucator cate
                  *   maini a luat)
                  * */
@@ -608,6 +614,8 @@ public class GameTab extends Fragment {
                 /* TODO: daca handsLeft e 0, calculam punctajele si le trimitem la ScoreTab prin
                  *   intermediul unui Singleton, si modificam o valoare din baza de date care sa
                  *   declanseze inceputul altui joc de 8 */
+
+
             }
 
             @Override
@@ -624,12 +632,40 @@ public class GameTab extends Fragment {
         };
     }
 
+    private void setNextHand(int maxCardIndex) {
+
+
+
+        // setare lastPlayerIndex
+        if (maxCardIndex > 0) {
+            lastPlayerIndex = maxCardIndex - 1;
+        } else {
+            lastPlayerIndex = playerCount - 1;
+        }
+
+        // resetam cards
+        cards.clear();
+        cardsInit();
+
+        if(maxCardIndex + 1 == myIndex) {
+            // resetare color
+            handsReference.child("Color").setValue("null");
+
+            for (int i = 0; i < playerCount; i++) {
+                if (i != maxCardIndex) {
+                    handsReference.child("Player" + (i + 1)).setValue("Pending");
+                }
+            }
+            handsReference.child("Player" + (maxCardIndex + 1)).setValue("Current");
+        }
+    }
+
 
     ////////////////////////////////////////////////////////////////////////////////////////////////
     // Alte metode
 
 
-    // mmetoda care seteaza onClick pe carti
+    // metoda care seteaza onClick pe carti
     private void setCardOnClick() {
         boolean sameColorCard = false;
         for (int i = 0; i < 8; i++) {
@@ -643,14 +679,20 @@ public class GameTab extends Fragment {
             // setare listener pe carte
             // se verifica daca s-a gasit vreo carte de aceeasi culoare cu cea care este deja data
             ImageView img = fragmentView.findViewById(resId);
-            String cardColor = extractColor(img.getContentDescription().toString());
-            if (!(color.equals("null")) && (cardColor.equals(color))) {
-                img.setOnClickListener(cardOnClickListener());
-                sameColorCard = true;
+
+            CharSequence imgDescription = img.getContentDescription();
+            if(imgDescription != null) {
+                String cardColor = extractColor(imgDescription.toString());
+                if (!(color.equals("null")) && (cardColor.equals(color))) {
+                    img.setOnClickListener(cardOnClickListener());
+                    sameColorCard = true;
+                }
+                if (color.equals("null")) {
+                    img.setOnClickListener(cardOnClickListener());
+                }
             }
-            if (color.equals("null")) {
-                img.setOnClickListener(cardOnClickListener());
-            }
+
+
 
         }
         // daca nu s-a gasit nicio carte de aceeasi culoare, se seteaza onclick pe toate cartile
@@ -665,7 +707,10 @@ public class GameTab extends Fragment {
 
                 // setare listener pe carte
                 ImageView img = fragmentView.findViewById(resId);
-                img.setOnClickListener(cardOnClickListener());
+
+                if(img.getContentDescription() != null) {
+                    img.setOnClickListener(cardOnClickListener());
+                }
             }
         }
 
