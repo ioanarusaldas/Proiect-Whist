@@ -1,7 +1,11 @@
 package com.example.whist;
 
+import android.animation.Animator;
+import android.animation.AnimatorSet;
+import android.animation.ObjectAnimator;
 import android.content.Context;
 import android.os.Bundle;
+import android.os.Handler;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -634,7 +638,8 @@ public class GameTab extends Fragment {
 
     private void setNextHand(int maxCardIndex) {
 
-
+        // animatie disparitie carte
+        fadeAnimaton();
 
         // setare lastPlayerIndex
         if (maxCardIndex > 0) {
@@ -647,7 +652,7 @@ public class GameTab extends Fragment {
         cards.clear();
         cardsInit();
 
-        if(maxCardIndex + 1 == myIndex) {
+        if (maxCardIndex + 1 == myIndex) {
             // resetare color
             handsReference.child("Color").setValue("null");
 
@@ -658,6 +663,44 @@ public class GameTab extends Fragment {
             }
             handsReference.child("Player" + (maxCardIndex + 1)).setValue("Current");
         }
+    }
+
+    private void setImageViews(AnimatorSet animatorSet) {
+        ImageView mySlot = fragmentView.findViewById(R.id.my_card_slot);
+        mySlot.setImageDrawable(null);
+        mySlot.setContentDescription(null);
+        mySlot.setAlpha(1f);
+        
+        animatorSet.removeAllListeners();
+    }
+
+    private void fadeAnimaton() {
+        ImageView mySlot = fragmentView.findViewById(R.id.my_card_slot);
+        ObjectAnimator fadeAnimation = ObjectAnimator.ofFloat(mySlot, View.ALPHA, 1.0f, 0.0f);
+        fadeAnimation.setDuration(2000);
+
+        final AnimatorSet animatorSet = new AnimatorSet();
+        animatorSet.play(fadeAnimation);
+        animatorSet.start();
+        animatorSet.addListener(new Animator.AnimatorListener() {
+
+            @Override
+            public void onAnimationStart(Animator animator) {
+            }
+
+            @Override
+            public void onAnimationEnd(Animator animator) {
+                setImageViews(animatorSet);
+            }
+
+            @Override
+            public void onAnimationCancel(Animator animator) {
+            }
+
+            @Override
+            public void onAnimationRepeat(Animator animator) {
+            }
+        });
     }
 
 
@@ -681,7 +724,7 @@ public class GameTab extends Fragment {
             ImageView img = fragmentView.findViewById(resId);
 
             CharSequence imgDescription = img.getContentDescription();
-            if(imgDescription != null) {
+            if (imgDescription != null) {
                 String cardColor = extractColor(imgDescription.toString());
                 if (!(color.equals("null")) && (cardColor.equals(color))) {
                     img.setOnClickListener(cardOnClickListener());
@@ -691,7 +734,6 @@ public class GameTab extends Fragment {
                     img.setOnClickListener(cardOnClickListener());
                 }
             }
-
 
 
         }
@@ -708,7 +750,7 @@ public class GameTab extends Fragment {
                 // setare listener pe carte
                 ImageView img = fragmentView.findViewById(resId);
 
-                if(img.getContentDescription() != null) {
+                if (img.getContentDescription() != null) {
                     img.setOnClickListener(cardOnClickListener());
                 }
             }
