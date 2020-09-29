@@ -638,8 +638,21 @@ public class GameTab extends Fragment {
 
     private void setNextHand(int maxCardIndex) {
 
-        // animatie disparitie carte
-        fadeAnimaton();
+        // animatie disparitie carte pentru slot-ul meu
+        ImageView mySlot = fragmentView.findViewById(R.id.my_card_slot);
+        fadeAnimaton(mySlot);
+
+        // animatie disparitie carte pentru slot-ul adversarului
+        for(int i = 0; i < playerCount - 1; i++) {
+            // extragem id-ul slotului in care punem imaginea
+            int resId = mContext.getResources().getIdentifier(
+                    "slot_player" + (i+1),
+                    "id",
+                    mContext.getPackageName()
+            );
+            ImageView opponentSlot = fragmentView.findViewById(resId);
+            fadeAnimaton(opponentSlot);
+        }
 
         // setare lastPlayerIndex
         if (maxCardIndex > 0) {
@@ -665,18 +678,10 @@ public class GameTab extends Fragment {
         }
     }
 
-    private void setImageViews(AnimatorSet animatorSet) {
-        ImageView mySlot = fragmentView.findViewById(R.id.my_card_slot);
-        mySlot.setImageDrawable(null);
-        mySlot.setContentDescription(null);
-        mySlot.setAlpha(1f);
-        
-        animatorSet.removeAllListeners();
-    }
 
-    private void fadeAnimaton() {
-        ImageView mySlot = fragmentView.findViewById(R.id.my_card_slot);
-        ObjectAnimator fadeAnimation = ObjectAnimator.ofFloat(mySlot, View.ALPHA, 1.0f, 0.0f);
+
+    private void fadeAnimaton(final ImageView slot) {
+        ObjectAnimator fadeAnimation = ObjectAnimator.ofFloat(slot, View.ALPHA, 1.0f, 0.0f);
         fadeAnimation.setDuration(2000);
 
         final AnimatorSet animatorSet = new AnimatorSet();
@@ -686,11 +691,13 @@ public class GameTab extends Fragment {
 
             @Override
             public void onAnimationStart(Animator animator) {
+                disableOnClickOnCards();
             }
 
             @Override
             public void onAnimationEnd(Animator animator) {
-                setImageViews(animatorSet);
+                enableOnClickOnCards();
+                setImageViews(slot, animatorSet);
             }
 
             @Override
@@ -703,9 +710,52 @@ public class GameTab extends Fragment {
         });
     }
 
+    private void setImageViews(ImageView slot, AnimatorSet animatorSet) {
+
+        slot.setImageDrawable(null);
+        slot.setContentDescription(null);
+        slot.setAlpha(1f);
+
+        animatorSet.removeAllListeners();
+    }
+
 
     ////////////////////////////////////////////////////////////////////////////////////////////////
     // Alte metode
+
+    // blocheaza onClick pe carti
+    private void disableOnClickOnCards() {
+        for (int i = 0; i < 8; i++) {
+            // extragere id al cartii in functie de nume
+            int resId = mContext.getResources().getIdentifier(
+                    "card_slot_" + (i + 1),
+                    "id",
+                    mContext.getPackageName()
+            );
+
+            // setare listener pe carte
+            // se verifica daca s-a gasit vreo carte de aceeasi culoare cu cea care este deja data
+            ImageView img = fragmentView.findViewById(resId);
+            img.setEnabled(false);
+        }
+    }
+
+    // activeaza onclick pe carti
+    private void enableOnClickOnCards() {
+        for (int i = 0; i < 8; i++) {
+            // extragere id al cartii in functie de nume
+            int resId = mContext.getResources().getIdentifier(
+                    "card_slot_" + (i + 1),
+                    "id",
+                    mContext.getPackageName()
+            );
+
+            // setare listener pe carte
+            // se verifica daca s-a gasit vreo carte de aceeasi culoare cu cea care este deja data
+            ImageView img = fragmentView.findViewById(resId);
+            img.setEnabled(true);
+        }
+    }
 
 
     // metoda care seteaza onClick pe carti
