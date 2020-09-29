@@ -4,12 +4,20 @@ import android.content.Context;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
+
+import com.google.firebase.database.ChildEventListener;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
 
 import java.util.ArrayList;
 
@@ -21,7 +29,15 @@ public class ScoreTab extends Fragment {
     private Context mContext;
     private View fragmentView;
 
-    public ScoreTab() {}
+
+    ArrayList<TextView> nameTextViews = new ArrayList<>();
+    private ArrayList<TextView> scoreTextViews = new ArrayList<>();
+
+
+    private ScoreSingleton scoreSingletonInstance = ScoreSingleton.getInstance();
+
+    public ScoreTab() {
+    }
 
     @Override
     public void onAttach(@NonNull Context context) {
@@ -50,12 +66,90 @@ public class ScoreTab extends Fragment {
         super.onResume();
 
         setTable();
+
+        setTurnFinishedListener();
+
+    }
+
+    private void setTurnFinishedListener() {
+        DatabaseReference handsLeftReference = FirebaseDatabase.getInstance().
+                getReference().child("Game").child("Turn").child("TurnFinished");
+
+        handsLeftReference.addChildEventListener(new ChildEventListener() {
+            @Override
+            public void onChildAdded(@NonNull DataSnapshot snapshot, @Nullable String previousChildName) {
+
+                String value = snapshot.getValue(String.class);
+                if (value.equals("True")) {
+                    setNewScores();
+                }
+            }
+
+            @Override
+            public void onChildChanged(@NonNull DataSnapshot snapshot, @Nullable String previousChildName) {
+
+                String value = snapshot.getValue(String.class);
+                if (value.equals("True")) {
+                    setNewScores();
+                }
+
+            }
+
+            @Override
+            public void onChildRemoved(@NonNull DataSnapshot snapshot) {
+
+            }
+
+            @Override
+            public void onChildMoved(@NonNull DataSnapshot snapshot, @Nullable String previousChildName) {
+
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+
+            }
+        });
+    }
+
+    private void setNewScores() {
+        ArrayList<Integer> bids = scoreSingletonInstance.getBids();
+        ArrayList<Integer> handsWon = scoreSingletonInstance.getHandsWon();
+
+        for(int i = 0; i < players.size(); i++) {
+
+            // extragem id-ul campului de scor al jucatorului
+            int resId = mContext.getResources().getIdentifier(
+                    "score_player_" + (i+1),
+                    "id",
+                    mContext.getPackageName()
+            );
+
+            TextView currentTextView = fragmentView.findViewById(resId);
+
+            int score = Integer.parseInt(currentTextView.getText().toString());
+
+            int currentBid = bids.get(i);
+            int currentHandsWon = handsWon.get(i);
+
+            if(currentBid == currentHandsWon) {
+                score += (5 + currentBid);
+            } else {
+                score -= Math.abs(currentBid - currentHandsWon);
+            }
+
+            currentTextView.setText(Integer.toString(score));
+
+        }
+
+        Log.d("scoreLog", bids.toString());
+        Log.d("scoreLog", handsWon.toString());
     }
 
 
     // metoda care seteaza tabelul de scor
     private void setTable() {
-        ArrayList<TextView> nameTextViews = new ArrayList<>();
+
         nameTextViews.add((TextView) fragmentView.findViewById(R.id.score_player_name_1));
         nameTextViews.add((TextView) fragmentView.findViewById(R.id.score_player_name_2));
         nameTextViews.add((TextView) fragmentView.findViewById(R.id.score_player_name_3));
@@ -63,7 +157,6 @@ public class ScoreTab extends Fragment {
         nameTextViews.add((TextView) fragmentView.findViewById(R.id.score_player_name_5));
         nameTextViews.add((TextView) fragmentView.findViewById(R.id.score_player_name_6));
 
-        ArrayList<TextView> scoreTextViews = new ArrayList<>();
         scoreTextViews.add((TextView) fragmentView.findViewById(R.id.score_player_1));
         scoreTextViews.add((TextView) fragmentView.findViewById(R.id.score_player_2));
         scoreTextViews.add((TextView) fragmentView.findViewById(R.id.score_player_3));
@@ -72,8 +165,7 @@ public class ScoreTab extends Fragment {
         scoreTextViews.add((TextView) fragmentView.findViewById(R.id.score_player_6));
 
 
-
-        for(int i = 5; i >= players.size(); i--) {
+        for (int i = 5; i >= players.size(); i--) {
             nameTextViews.get(i).setVisibility(View.GONE);
             scoreTextViews.get(i).setVisibility(View.GONE);
 
@@ -81,10 +173,9 @@ public class ScoreTab extends Fragment {
             scoreTextViews.remove(i);
         }
 
-        for(int i = 0; i < players.size(); i++) {
+        for (int i = 0; i < players.size(); i++) {
             nameTextViews.get(i).setText(players.get(i));
         }
-
 
     }
 }

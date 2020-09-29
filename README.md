@@ -135,6 +135,19 @@ de la primul jucator
 - implementare scoreTab
 - setare nume al jucatorilor in tabel
 
+28.09 - Sergiu + Rusalda
+- jucatorii dau jos toate cartile din mana
+- se determina corect castigatorul mainii si se seteaza corect ordinea in care trebuie
+sa dea maini jos jucatorii
+
+29.09 - Sergiu + Rusalda
+- adaugare background de culoare diferita pentru jucatorul care da jos carte
+- introdus o animatie de fade pe carti dupa toata lumea a dat o carte
+- am creat o clasa ScoreSingleton cu care transmitem de la GameTab la ScoreTab
+bids si handsWon dupa ce toate cartile au fost date jos
+- calculare score in scoreTab si actualizare tabel
+- TextView-urie cu Bids apar imediat ce un player a votat, nu dupa ce toti au
+votat
 
 ===============================================================================
 
