@@ -149,6 +149,12 @@ bids si handsWon dupa ce toate cartile au fost date jos
 - TextView-urie cu Bids apar imediat ce un player a votat, nu dupa ce toti au
 votat
 
+
+04.10 - Sergiu + Rusalda
+- Dezactivare buton de bid pentru ultimul jucator (astfel incat suma bidurilor
+sa nu dea 8)
+
+
 ===============================================================================
 
 

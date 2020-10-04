@@ -27,6 +27,8 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.GenericTypeIndicator;
 
+import org.w3c.dom.Text;
+
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -49,7 +51,6 @@ public class GameTab extends Fragment {
     private DatabaseReference bidReference;
     private DatabaseReference handsReference;
     private DatabaseReference handsLeftReference;
-    private DatabaseReference handsWonReference;
 
     // lista bid-urilor, cartilor date si a mainilor castigate
     private final ArrayList<Integer> bids = new ArrayList<>();
@@ -91,7 +92,6 @@ public class GameTab extends Fragment {
         // creare intrare "Hands" pentru a gestiona jocurile, handsLeft pentru maini ramase, Score pentru a gestiona scorul (maini luate
         handsReference = turnReference.child("Hands");
         handsLeftReference = turnReference.child("HandsLeft");
-        handsWonReference = turnReference.child("HandsWon");
 
     }
 
@@ -157,7 +157,6 @@ public class GameTab extends Fragment {
                     bidReference.child("Player" + (i + 1)).setValue("Pending");
                     handsReference.child("Player" + (i + 1)).setValue("Pending");
                 }
-                handsWonReference.child("Player" + (i + 1)).setValue(0);
             }
 
             // setam pe intrarea jucatorului curent faptul ca el este cel care trebuie sa aleaga
@@ -175,7 +174,7 @@ public class GameTab extends Fragment {
 
         /// Inregistrarea bid-urilor jucatorilor
         // setare listener pe bidReference si pe handsLeftReference si pe intrarea "Color"
-        bidReference.addChildEventListener(bidListener());
+        bidReference.addChildEventListener(bidListener(gameType));
         handsReference.addChildEventListener(colorChanged());
         handsLeftReference.addChildEventListener(handsLeftChanged());
 
@@ -202,9 +201,9 @@ public class GameTab extends Fragment {
     // metoda care seteaza cate un listener pe fiecare buton de bid
     private void setButtonListeners() {
 
-        GridLayout buttonsGrid = fragmentView.findViewById(R.id.buttons_grid);
+        final GridLayout buttonsGrid = fragmentView.findViewById(R.id.buttons_grid);
         final LinearLayout bidLayout = fragmentView.findViewById(R.id.bid_layout);
-        int buttonsCount = buttonsGrid.getChildCount();
+        final int buttonsCount = buttonsGrid.getChildCount();
 
         for (int i = 0; i < buttonsCount; i++) {
             Button b = (Button) buttonsGrid.getChildAt(i);
@@ -218,6 +217,11 @@ public class GameTab extends Fragment {
 
                     // ascundem bid_layout
                     bidLayout.setVisibility(View.GONE);
+
+                    for(int j = 0; j < buttonsCount; j++) {
+                        Button button = (Button) buttonsGrid.getChildAt(j);
+                        button.setEnabled(true);
+                    }
 
                     // setam bid-ul in baza de date
                     bidReference.child("Player" + myIndex).setValue(value);
@@ -286,32 +290,7 @@ public class GameTab extends Fragment {
         }
     }
 
-    // metoda care seteaza pe ecran bid-urile date de fiecare jucator
-    private void setBidTextViews() {
-        // ArrayList cu textView-urile in care se pun bid-urile
-        ArrayList<TextView> bidTextViews = new ArrayList<>(5);
-        bidTextViews.add((TextView) fragmentView.findViewById(R.id.player1_bid));
-        bidTextViews.add((TextView) fragmentView.findViewById(R.id.player2_bid));
-        bidTextViews.add((TextView) fragmentView.findViewById(R.id.player3_bid));
-        bidTextViews.add((TextView) fragmentView.findViewById(R.id.player4_bid));
-        bidTextViews.add((TextView) fragmentView.findViewById(R.id.player5_bid));
-
-        // textview-ul in care se pune bid-ul jucatorului curent
-        TextView myBidTextView = fragmentView.findViewById(R.id.my_bid_text_view);
-        myBidTextView.setVisibility(View.VISIBLE);
-        myBidTextView.setText("Bid: " + bids.get(myIndex - 1));
-
-        int index = 0;
-        // setare bid pt adversari
-        for (int i = 0; i < playerCount; i++) {
-            if ((i + 1) != myIndex) {
-                bidTextViews.get(index).setVisibility(View.VISIBLE);
-                bidTextViews.get(index++).setText("Bid: " + bids.get(i));
-            }
-        }
-    }
-
-
+    // setarea unui text-view
     private void setBidTextView(String key, String result) {
 
         int playerIndex = Character.getNumericValue(key.charAt(key.length() - 1));
@@ -319,7 +298,7 @@ public class GameTab extends Fragment {
         if (playerIndex == myIndex) {
             TextView tv = fragmentView.findViewById(R.id.my_bid_text_view);
             tv.setVisibility(View.VISIBLE);
-            tv.setText("Bid: " + Integer.parseInt(result));
+            tv.setText("Bid: 0/" + Integer.parseInt(result));
         } else {
             if (playerIndex > myIndex) {
                 playerIndex--;
@@ -333,7 +312,7 @@ public class GameTab extends Fragment {
 
             TextView tv = fragmentView.findViewById(bidId);
             tv.setVisibility(View.VISIBLE);
-            tv.setText("Bid: " + Integer.parseInt(result));
+            tv.setText("Bid: 0/" + Integer.parseInt(result));
         }
     }
 
@@ -394,7 +373,7 @@ public class GameTab extends Fragment {
 
 
     // listener pe intrarea de Bid
-    private ChildEventListener bidListener() {
+    private ChildEventListener bidListener(final int gameType) {
         return new ChildEventListener() {
             @Override
             public void onChildAdded(@NonNull DataSnapshot snapshot, @Nullable String previousChildName) {
@@ -408,6 +387,31 @@ public class GameTab extends Fragment {
                     // setam vizibilitatea layout-ului din mijloc pe true
                     LinearLayout bidLayout = fragmentView.findViewById(R.id.bid_layout);
                     bidLayout.setVisibility(View.VISIBLE);
+
+                    // calculare valoare pentru butonul care trebuie dezactivat
+                    //int bidsSum = 0;
+                    // verificare pozitie jucator curent
+                    if(myIndex == lastPlayerIndex + 1) {
+                        int bidsSum = 0;
+
+                        // calculare suma elementelor din bids
+                        for (int bid : bids) {
+                            bidsSum += bid;
+                        }
+
+                        if (bidsSum <= gameType) {
+
+                            int bidId = mContext.getResources().getIdentifier(
+                                    "bid_button_" + (gameType - bidsSum),
+                                    "id",
+                                    mContext.getPackageName()
+                            );
+
+                            // dezactivare buton
+                            Button disabledButton = fragmentView.findViewById(bidId);
+                            disabledButton.setEnabled(false);
+                        }
+                    }
 
                 } else {
                     // adaugam in arraylist valorile numerice
@@ -431,6 +435,31 @@ public class GameTab extends Fragment {
                     // setam vizibilitatea layout-ului din mijloc pe true
                     LinearLayout bidLayout = fragmentView.findViewById(R.id.bid_layout);
                     bidLayout.setVisibility(View.VISIBLE);
+
+                    // calculare valoare pentru butonul care trebuie dezactivat
+                    //int bidsSum = 0;
+                    // verificare pozitie jucator curent
+                    if(myIndex == lastPlayerIndex + 1) {
+                        int bidsSum = 0;
+
+                        // calculare suma elementelor din bids
+                        for (int bid : bids) {
+                            bidsSum += bid;
+                        }
+
+                        if (bidsSum <= gameType) {
+
+                            int bidId = mContext.getResources().getIdentifier(
+                                    "bid_button_" + (gameType - bidsSum),
+                                    "id",
+                                    mContext.getPackageName()
+                            );
+
+                            // dezactivare buton
+                            Button disabledButton = fragmentView.findViewById(bidId);
+                            disabledButton.setEnabled(false);
+                        }
+                    }
 
                 } else {
                     // adaugam in arraylist valorile numerice
@@ -653,19 +682,31 @@ public class GameTab extends Fragment {
                 // setare castigator mana
                 handsWon.set(maxCardIndex, handsWon.get(maxCardIndex) + 1);
 
+
+                    
+                // setare textview cu bid
+                if(maxCardIndex + 1 == myIndex) {
+                    TextView myTextView = fragmentView.findViewById(R.id.my_bid_text_view);
+                    myTextView.setText("Bid: " + handsWon.get(maxCardIndex) + "/" + bids.get(maxCardIndex));
+                } else {
+                    int winnerIndex = maxCardIndex;
+                    if (maxCardIndex + 1  > myIndex) {
+                        winnerIndex--;
+                    }
+                    int resId = mContext.getResources().getIdentifier(
+                            "player" + (winnerIndex+1) + "_bid",
+                            "id",
+                            mContext.getPackageName()
+                    );
+                    TextView winnerTextView = fragmentView.findViewById(resId);
+                    winnerTextView.setText("Bid: " + handsWon.get(maxCardIndex) + "/" + bids.get(maxCardIndex));
+                }
+
                 // DEBUG ONLY: logare handsWon
                 Log.d("handsWon", handsWon.toString());
 
-                if (handsLeft > 0) {
-                    setNextHand(maxCardIndex);
-                } else if (handsLeft == 0) {
-                    scoreSingletonInstance.setBids(bids);
-                    scoreSingletonInstance.setHandsWon(handsWon);
 
-                    turnReference.child("TurnFinished").child("isFinished").setValue("True");
-                }
-
-                /* TODO: Daca handsLeft > 0, setam color pe null, setam Current si Pending pe jucatori
+                /* Daca handsLeft > 0, setam color pe null, setam Current si Pending pe jucatori
                  *   in functie de maxCardIndex (jucatorul castigator), eliminam cartile din slot-uri,
                  *  setam lastPlayerIndex in functie de maxCardIndex
                  *   (eventual folosind o animatie si actualizand in dreptul fiecarui jucator cate
@@ -676,7 +717,14 @@ public class GameTab extends Fragment {
                  *   intermediul unui Singleton, si modificam o valoare din baza de date care sa
                  *   declanseze inceputul altui joc de 8 */
 
+                if (handsLeft > 0) {
+                    setNextHand(maxCardIndex);
+                } else if (handsLeft == 0) {
+                    scoreSingletonInstance.setBids(bids);
+                    scoreSingletonInstance.setHandsWon(handsWon);
 
+                    turnReference.child("TurnFinished").child("isFinished").setValue("True");
+                }
             }
 
             @Override
