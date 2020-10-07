@@ -5,7 +5,7 @@
 
 TODO:
 
-- Design frumos la ScoreTab + Tabelul cu scorul
+- Design frumos la ScoreTab + Tabelul cu scorul - rezolvat
 - Continuam functia turn cu dat-ul cartilor
 
 ===============================================================================
